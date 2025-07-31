@@ -6,6 +6,11 @@ const mapHeight = 1250;
 
 const player = new Player(400, 300);
 
+const firePatches = [
+    new FirePatch(600, 400),
+    new FirePatch(900, 700)
+]
+
 const camera = {
     x: player.x - canvas.width / 2,
     y: player.y - canvas.height / 2
@@ -19,6 +24,8 @@ const walls = [
 
 function update(deltaTime) {
     player.update(deltaTime, keysPressed, camera, mapWidth, mapHeight, isCollidingWithWall);
+    firePatches.forEach(f => f.update(deltaTime));
+    checkSwordHits();
 }
 
 function draw() {
@@ -33,6 +40,7 @@ function draw() {
         ctx.fillRect(wall.x - camera.x, wall.y - camera.y, wall.width, wall.height);
     }
     player.draw(ctx, camera);
+    firePatches.forEach(f => f.draw(ctx, camera));
 
 }
 
@@ -72,6 +80,23 @@ function startShieldBlock() {
         player.blockTimer = 0;
         player.lastBlockTime = now;
     }
+}
+
+function checkSwordHits() {
+    if (!player.isSwinging) return;
+
+    firePatches.forEach(fire => {
+        if (!fire.isAlive || fire.isFading) return;
+
+        const dx = fire.x - player.x;
+        const dy = fire.y - player.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+
+        // Sword hit range: within sword reach & in swing
+        if (dist < player.radius + fire.radius + 40) {
+            fire.hit();
+        }
+    })
 }
 
 let lastTimestamp = 0;
