@@ -9,7 +9,14 @@ const player = new Player(400, 300);
 const firePatches = [
     new FirePatch(600, 400),
     new FirePatch(900, 700)
-]
+];
+const FIRE_CAP = 50;
+const MIN_SPAWN_INTERVAL = 1500; // 2 seconds
+const MAX_SPAWN_INTERVAL = 5000; // 6 seconds
+let lastFireSpawnTime = 0;
+let fireSpawnInterval = 3000;
+
+const fireShards = [];
 
 const camera = {
     x: player.x - canvas.width / 2,
@@ -22,10 +29,48 @@ const walls = [
     { x: 800, y: 720, width: 650, height: 400 }
 ];
 
+// Start with 2 patches
+for (let i = 0; i < 2; i++) {
+    spawnFirePatch();
+}
+
 function update(deltaTime) {
     player.update(deltaTime, keysPressed, camera, mapWidth, mapHeight, isCollidingWithWall);
     firePatches.forEach(f => f.update(deltaTime));
     checkSwordHits();
+    // Remove dead fires
+    for (let i = firePatches.length - 1; i >= 0; i--) {
+        if (!firePatches[i].isAlive) {
+            firePatches.splice(i, 1);
+        }
+    }
+
+    // Dynamic spawn timing
+    const aliveCount = firePatches.length;
+    const now = performance.now();
+    const difficultyFactor = aliveCount / FIRE_CAP;
+    fireSpawnInterval = MIN_SPAWN_INTERVAL + difficultyFactor * (MAX_SPAWN_INTERVAL - MIN_SPAWN_INTERVAL);
+
+    if (now - lastFireSpawnTime >= fireSpawnInterval) {
+        spawnFirePatch();
+        lastFireSpawnTime = now;
+    }
+
+    // Collect fire shards
+    fireShards.forEach(shard => {
+        if (!shard.isCollected) {
+            const dx = shard.x - player.x;
+            const dy = shard.y - player.y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            // Use max dimension as "radius" for pickup
+            const shardRadius = Math.max(shard.width, shard.height) / 2;
+            if (dist < player.radius + shardRadius) {
+                shard.isCollected = true;
+                // increase inventory count
+                player.fireShards += 1;
+            }
+        }
+    })
 }
 
 function draw() {
@@ -41,7 +86,7 @@ function draw() {
     }
     player.draw(ctx, camera);
     firePatches.forEach(f => f.draw(ctx, camera));
-
+    fireShards.forEach(shard => shard.draw(ctx, camera, performance.now()));
 }
 
 
@@ -95,8 +140,57 @@ function checkSwordHits() {
         // Sword hit range: within sword reach & in swing
         if (dist < player.radius + fire.radius + 40) {
             fire.hit();
+            fireShards.push(new FireShard(fire.x, fire.y));
         }
     })
+}
+
+function spawnFirePatch() {
+    if (firePatches.length >= FIRE_CAP) return;
+
+    let tries = 0;
+    while (tries < 50) { // avoid infinite loop if map is crowded
+        const x = Math.random() * (mapWidth - 100) + 50;
+        const y = Math.random() * (mapHeight - 100) + 50;
+
+        // 1. Avoid spawning inside player
+        const distToPlayer = Math.hypot(x - player.x, y - player.y);
+        if (distToPlayer < player.radius + 50) {
+            tries++;
+            continue;
+        }
+
+        // 2. Avoid spawning inside walls
+        let insideWall = false;
+        for (const wall of walls) {
+            if (x > wall.x - 25 && x < wall.x + wall.width + 25 && y > wall.y - 25 && y < wall.y + wall.height + 25) {
+                insideWall = true;
+                break;
+            }
+        }
+        if (insideWall) {
+            tries++;
+            continue;
+        }
+
+        // 3. Avoid spawning on top of another fire patch
+        let tooCloseToFire = false;
+        for (const fire of firePatches) {
+            const distToFire = Math.hypot(x - fire.x, y - fire.y);
+            if (distToFire < fire.radius * 2) {
+                tooCloseToFire = true;
+            }
+        }
+        if (tooCloseToFire) {
+            tries++;
+            continue;
+        }
+
+        // Valid location found
+        firePatches.push(new FirePatch(x, y));
+        console.log(firePatches.length);
+        return;
+    }
 }
 
 let lastTimestamp = 0;
