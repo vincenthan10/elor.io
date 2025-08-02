@@ -3,8 +3,9 @@ class Player {
         this.x = x;
         this.y = y;
         this.radius = 20;
-        this.speed = 3;
+        this.speed = 4;
         this.aimAngle = 0;
+        this.fireShards = 0;
 
         // Sword animation
         this.isSwinging = false;
