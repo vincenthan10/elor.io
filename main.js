@@ -18,6 +18,18 @@ let fireSpawnInterval = 3000;
 
 const fireShards = [];
 
+let inventoryOpen = false;
+const inventoryButton = {
+    x: 20,
+    y: canvas.height - 50,
+    width: 100,
+    height: 30
+}
+const invX = 150;
+const invY = canvas.height - 150;
+const invW = 200;
+const invH = 120;
+
 const camera = {
     x: player.x - canvas.width / 2,
     y: player.y - canvas.height / 2
@@ -87,6 +99,37 @@ function draw() {
     player.draw(ctx, camera);
     firePatches.forEach(f => f.draw(ctx, camera));
     fireShards.forEach(shard => shard.draw(ctx, camera, performance.now()));
+
+    // Inventory button
+    ctx.fillStyle = "#444";
+    ctx.fillRect(inventoryButton.x, inventoryButton.y, inventoryButton.width, inventoryButton.height);
+    ctx.strokeStyle = "white";
+    ctx.strokeRect(inventoryButton.x, inventoryButton.y, inventoryButton.width, inventoryButton.height);
+    ctx.fillStyle = "white";
+    ctx.font = "16px Arial";
+    ctx.fillText("Inventory", inventoryButton.x + 15, inventoryButton.y + 20);
+
+    if (inventoryOpen) {
+
+        // Background box
+        ctx.fillStyle = "#222";
+        ctx.fillRect(invX, invY, invW, invH);
+        ctx.strokeStyle = "white";
+        ctx.strokeRect(invX, invY, invW, invH);
+        ctx.fillStyle = "white";
+        ctx.font = "18px Arial";
+        ctx.fillText("Inventory", invX + 10, invY + 25);
+
+        if (player.fireShards > 0) {
+            const shardIcon = new FireShard(invX + 10, invY + 40);
+            shardIcon.drawIcon(ctx, invX + 15, invY + 40);
+            ctx.fillStyle = "white";
+            ctx.fillText(`Fire Shards x ${player.fireShards}`, invX + 35, invY + 50);
+        } else {
+            ctx.fillStyle = "white";
+            ctx.fillText("Empty", invX + 20, invY + 55);
+        }
+    }
 }
 
 
@@ -207,6 +250,7 @@ function gameLoop(timestamp) {
 document.addEventListener("keydown", (e) => {
     keysPressed.add(e.key.toLowerCase());
     if (e.key == "q") player.mouseMovement = !player.mouseMovement;
+    if (e.key == "z") inventoryOpen = !inventoryOpen;
     if (e.code == "Space") startSwordSwing();
     if (e.code == "ShiftLeft" || e.code == "ShiftRight") startShieldBlock();
 })
@@ -215,6 +259,32 @@ document.addEventListener("keydown", (e) => {
 
 document.addEventListener("keyup", (e) => {
     keysPressed.delete(e.key.toLowerCase());
+})
+
+canvas.addEventListener("mousedown", (e) => {
+    const mouseX = e.offsetX;
+    const mouseY = e.offsetY;
+
+    // Check if inside button
+    if (e.button === 0) {
+        if (mouseX >= inventoryButton.x && mouseX <= inventoryButton.x + inventoryButton.width && mouseY >= inventoryButton.y && mouseY <= inventoryButton.y + inventoryButton.height) {
+            inventoryOpen = true;
+            return; // returns so that it doesn't swing sword or block
+        } else {
+            if (inventoryOpen && !(mouseX >= invX && mouseX <= invX + invW && mouseY >= invY && mouseY <= invY + invH)) {
+                inventoryOpen = false;
+                return;
+            } else {
+                startSwordSwing();
+            }
+        }
+    }
+
+    if (e.button === 2) {
+        startShieldBlock();
+    }
+
+
 })
 
 document.addEventListener("mousedown", (e) => {
