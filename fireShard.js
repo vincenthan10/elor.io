@@ -48,4 +48,24 @@ class FireShard {
 
         ctx.restore();
     }
+
+    drawIcon(ctx, x, y, scale = 1) {
+        ctx.save();
+        ctx.translate(x, y);
+        ctx.scale(scale, scale);
+
+        ctx.shadowBlur = 10;
+        ctx.shadowColor = "#ff5d28";
+
+        ctx.beginPath();
+        ctx.moveTo(-2, -4);
+        ctx.lineTo(10, -6);
+        ctx.lineTo(11, 12);
+        ctx.lineTo(-3, 9);
+        ctx.closePath();
+
+        ctx.fillStyle = "#ff5d28";
+        ctx.fill();
+        ctx.restore();
+    }
 }
