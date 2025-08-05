@@ -57,6 +57,22 @@ function update(deltaTime) {
         }
     }
 
+    // Player-fire collision
+    firePatches.forEach(fire => {
+        if (fire.isAlive && !fire.isFading) {
+            const dx = player.x - fire.x;
+            const dy = player.y - fire.y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            if (dist < player.radius + fire.radius) {
+                const now = performance.now();
+                if (now - player.lastDamageTime > 1000) { // 1s cooldown
+                    takeDamage(4);
+                    player.lastDamageTime = now;
+                }
+            }
+        }
+    })
+
     // Dynamic spawn timing
     const aliveCount = firePatches.length;
     const now = performance.now();
@@ -86,7 +102,6 @@ function update(deltaTime) {
 }
 
 function draw() {
-
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.strokeStyle = "red";
     ctx.lineWidth = 5;
@@ -130,6 +145,16 @@ function draw() {
             ctx.fillText("Empty", invX + 20, invY + 55);
         }
     }
+
+    // HP bar
+    ctx.fillStyle = "red";
+    ctx.fillRect(10, 10, 125, 25);
+
+    ctx.fillStyle = "limegreen";
+    ctx.fillRect(10, 10, (player.hp / player.maxHp) * 125, 25);
+
+    ctx.strokeStyle = "black";
+    ctx.strokeRect(10, 10, 125, 25);
 }
 
 
@@ -236,8 +261,14 @@ function spawnFirePatch() {
     }
 }
 
-let lastTimestamp = 0;
+function takeDamage(amount) {
+    player.hp -= amount;
+    if (player.hp < 0) player.hp = 0;
+    console.log(`Player HP: ${player.hp}/${player.maxHp}`);
+}
 
+
+let lastTimestamp = 0;
 function gameLoop(timestamp) {
     const deltaTime = timestamp - lastTimestamp;
     lastTimestamp = timestamp;
