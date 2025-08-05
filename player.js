@@ -6,6 +6,9 @@ class Player {
         this.speed = 4;
         this.aimAngle = 0;
         this.fireShards = 0;
+        this.maxHp = 10;
+        this.hp = this.maxHp;
+        this.lastDamageTime = 0;
 
         // Sword animation
         this.isSwinging = false;
@@ -18,8 +21,8 @@ class Player {
         // Shield animation
         this.isBlocking = false;
         this.blockTimer = 0;
-        this.blockDuration = 300;
-        this.blockCooldown = 600;
+        this.blockDuration = 750;
+        this.blockCooldown = 1500;
         this.lastBlockTime = 0;
 
         // Mouse movement
