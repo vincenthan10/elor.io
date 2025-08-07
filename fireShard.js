@@ -5,6 +5,8 @@ class FireShard {
         this.width = 16;
         this.height = 20;
         this.isCollected = false;
+        this.isAlive = true;
+        this.lifetime = 0;
         // Store consistent irregular corners
         this.cornerOffsets = [
             { x: Math.random() * 4, y: Math.random() * 4 },
@@ -14,8 +16,16 @@ class FireShard {
         ];
     }
 
+    update(deltaTime) {
+        this.lifetime += deltaTime;
+
+        if (this.lifetime >= 15000) {
+            this.isAlive = false; // despawn after 15 seconds
+        }
+    }
+
     draw(ctx, camera, time) {
-        if (this.isCollected) return;
+        if (this.isCollected || !this.isAlive) return;
 
         ctx.save();
         ctx.globalAlpha = 1; // fully visible
