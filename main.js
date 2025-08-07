@@ -16,7 +16,7 @@ const MAX_SPAWN_INTERVAL = 5000; // 6 seconds
 let lastFireSpawnTime = 0;
 let fireSpawnInterval = 3000;
 
-const fireShards = [];
+let fireShards = [];
 
 let inventoryOpen = false;
 const inventoryButton = {
@@ -65,7 +65,7 @@ function update(deltaTime) {
             const dist = Math.sqrt(dx * dx + dy * dy);
             if (dist < player.radius + fire.radius) {
                 const now = performance.now();
-                if (now - player.lastDamageTime > 1000) { // 1s cooldown
+                if (now - player.lastDamageTime > 1000 && !player.isBlocking) { // 1s cooldown
                     takeDamage(4);
                     player.lastDamageTime = now;
                 }
@@ -86,7 +86,8 @@ function update(deltaTime) {
 
     // Collect fire shards
     fireShards.forEach(shard => {
-        if (!shard.isCollected) {
+        if (!shard.isCollected && shard.isAlive) {
+            shard.update(deltaTime);
             const dx = shard.x - player.x;
             const dy = shard.y - player.y;
             const dist = Math.sqrt(dx * dx + dy * dy);
@@ -99,6 +100,7 @@ function update(deltaTime) {
             }
         }
     })
+    fireShards = fireShards.filter(shard => shard.isAlive);
 }
 
 function draw() {
@@ -207,8 +209,10 @@ function checkSwordHits() {
 
         // Sword hit range: within sword reach & in swing
         if (dist < player.radius + fire.radius + 40) {
-            fire.hit();
-            fireShards.push(new FireShard(fire.x, fire.y));
+            fire.hit(player.damage);
+            if (fire.isFading) {
+                fireShards.push(new FireShard(fire.x, fire.y));
+            }
         }
     })
 }
