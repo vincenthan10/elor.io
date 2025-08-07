@@ -10,13 +10,14 @@ class Player {
         this.hp = this.maxHp;
         this.lastDamageTime = 0;
 
-        // Sword animation
+        // Sword animation and stats
         this.isSwinging = false;
         this.swingTimer = 0;
         this.swingDuration = 250;
         this.swingAngleOffset = 0;
         this.swingCooldown = 500;
         this.lastSwingTime = 0;
+        this.damage = 5;
 
         // Shield animation
         this.isBlocking = false;
