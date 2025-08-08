@@ -67,7 +67,12 @@ function update(deltaTime) {
                 const now = performance.now();
                 if (now - player.lastDamageTime > 1000 && !player.isBlocking) { // 1s cooldown
                     takeDamage(4);
+                    fire.hit(player.bodyDamage);
                     player.lastDamageTime = now;
+                    if (fire.isFading) {
+                        fireShards.push(new FireShard(fire.x, fire.y));
+                        player.addXP(fire.xp);
+                    }
                 }
             }
         }
@@ -157,6 +162,25 @@ function draw() {
 
     ctx.strokeStyle = "black";
     ctx.strokeRect(10, 10, 125, 25);
+
+    // XP bar background (gray)
+    ctx.fillStyle = "#555";
+    ctx.fillRect(10, 50, 75, 15);
+
+    // XP bar fill (blue)
+    ctx.fillStyle = "#436efcff";
+    const xpWidth = (player.xp / player.xpNeeded) * 75;
+    ctx.fillRect(10, 50, xpWidth, 15);
+
+    // XP bar border
+    ctx.strokeStyle = "black";
+    ctx.strokeRect(10, 50, 75, 15);
+
+    // XP text
+    ctx.fillStyle = "white";
+    ctx.font = "12px Arial";
+    ctx.fillText(`Level ${player.level}`, 10, 62.5);
+
 }
 
 
@@ -212,6 +236,7 @@ function checkSwordHits() {
             fire.hit(player.damage);
             if (fire.isFading) {
                 fireShards.push(new FireShard(fire.x, fire.y));
+                player.addXP(fire.xp);
             }
         }
     })
