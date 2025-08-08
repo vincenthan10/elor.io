@@ -8,6 +8,7 @@ class FirePatch {
         this.fadeAlpha = 1; // for fade-out animation
         this.maxHp = 7;
         this.hp = this.maxHp;
+        this.xp = 3;
 
         this.hitCooldown = 0;
     }
