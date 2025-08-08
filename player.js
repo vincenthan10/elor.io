@@ -8,7 +8,17 @@ class Player {
         this.fireShards = 0;
         this.maxHp = 10;
         this.hp = this.maxHp;
+        this.hpPerc = this.hp / this.maxHp;
         this.lastDamageTime = 0;
+        this.level = 1;
+        this.xp = 0;
+        this.xpNeeded = 10;
+        this.bodyDamage = 1;
+        this.regenUnlocked = false;
+        this.regenRate = 0.000416; // 0.5 hp per second
+        this.XP_GROWTH_RATE = 1.25;
+        this.HP_GROWTH_RATE = 1.2;
+        this.BODY_DAMAGE_GROWTH_RATE = 1.15;
 
         // Sword animation and stats
         this.isSwinging = false;
@@ -30,6 +40,37 @@ class Player {
         this.dx = 0;
         this.dy = 0;
         this.mouseMovement = false;
+    }
+
+    addXP(amount) {
+        this.xp += amount;
+        this.checkLevelUp();
+    }
+
+    checkLevelUp() {
+        if (this.xp >= this.xpNeeded) {
+            this.xp -= this.xpNeeded;
+            this.level++;
+            this.xpNeeded *= this.XP_GROWTH_RATE;
+            this.maxHp *= this.HP_GROWTH_RATE;
+            this.bodyDamage *= this.BODY_DAMAGE_GROWTH_RATE;
+            this.hp = this.maxHp * this.hpPerc;
+            console.log(`Player level: ${this.level}`);
+            console.log(`XP needed: ${this.xpNeeded}`);
+            console.log(`Player HP: ${this.maxHp}`);
+            console.log(`Player Body Damage: ${this.bodyDamage}`);
+        }
+
+
+        if (this.level === 2) {
+            this.regenUnlocked = true;
+        }
+    }
+
+    passiveRegen(deltaTime) {
+        if (this.regenUnlocked && this.hp < this.maxHp) {
+            this.hp = Math.min(this.hp + this.regenRate * deltaTime, this.maxHp);
+        }
     }
 
     update(deltaTime, keysPressed, camera, mapWidth, mapHeight, isCollidingWithWall) {
@@ -109,6 +150,11 @@ class Player {
                 this.isBlocking = false;
             }
         }
+
+        this.checkLevelUp();
+        this.passiveRegen(deltaTime);
+        this.hpPerc = this.hp / this.maxHp;
+
     }
 
     draw(ctx, camera) {
