@@ -5,6 +5,8 @@ const mapWidth = 2500;
 const mapHeight = 1250;
 
 const player = new Player(400, 300);
+const playerSpawnX = 400;
+const playerSpawnY = 300;
 
 const firePatches = [
     new FirePatch(600, 400),
@@ -30,6 +32,8 @@ const invY = canvas.height - 150;
 const invW = 200;
 const invH = 120;
 
+let gameOver = false;
+
 const camera = {
     x: player.x - canvas.width / 2,
     y: player.y - canvas.height / 2
@@ -47,6 +51,7 @@ for (let i = 0; i < 2; i++) {
 }
 
 function update(deltaTime) {
+    if (gameOver) return;
     player.update(deltaTime, keysPressed, camera, mapWidth, mapHeight, isCollidingWithWall);
     firePatches.forEach(f => f.update(deltaTime));
     checkSwordHits();
@@ -181,6 +186,19 @@ function draw() {
     ctx.font = "12px Arial";
     ctx.fillText(`Level ${player.level}`, 10, 62.5);
 
+    // Game Over screen
+    if (gameOver) {
+        ctx.fillStyle = "rgba(0, 0, 0, 0.7)";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        ctx.fillStyle = "white";
+        ctx.font = "40px Arial";
+        ctx.fillText("Game Over", canvas.width / 2 - 100, canvas.height / 2 - 40);
+
+        ctx.font = "16px Arial";
+        ctx.fillText("Press Enter to respawn, or click anywhere", canvas.width / 2 - 133, canvas.height / 2);
+    }
+
 }
 
 
@@ -292,7 +310,10 @@ function spawnFirePatch() {
 
 function takeDamage(amount) {
     player.hp -= amount;
-    if (player.hp < 0) player.hp = 0;
+    if (player.hp < 0) {
+        player.hp = 0;
+        gameOver = true;
+    }
     console.log(`Player HP: ${player.hp}/${player.maxHp}`);
 }
 
@@ -313,6 +334,12 @@ document.addEventListener("keydown", (e) => {
     if (e.key == "z") inventoryOpen = !inventoryOpen;
     if (e.code == "Space") startSwordSwing();
     if (e.code == "ShiftLeft" || e.code == "ShiftRight") startShieldBlock();
+    if (e.code == "Enter" && gameOver) {
+        player.x = playerSpawnX;
+        player.y = playerSpawnY;
+        player.hp = player.maxHp;
+        gameOver = false;
+    }
 })
 
 
@@ -326,7 +353,7 @@ canvas.addEventListener("mousedown", (e) => {
     const mouseY = e.offsetY;
 
     // Check if inside button
-    if (e.button === 0) {
+    if (e.button === 0 && !gameOver) {
         if (mouseX >= inventoryButton.x && mouseX <= inventoryButton.x + inventoryButton.width && mouseY >= inventoryButton.y && mouseY <= inventoryButton.y + inventoryButton.height) {
             inventoryOpen = true;
             return; // returns so that it doesn't swing sword or block
@@ -348,8 +375,12 @@ canvas.addEventListener("mousedown", (e) => {
 })
 
 document.addEventListener("mousedown", (e) => {
-    if (e.button === 0) startSwordSwing(); // left click
-    if (e.button === 2) startShieldBlock(); //right click
+    if (e.button === 0 && gameOver) {
+        player.hp = player.maxHp;
+        player.x = playerSpawnX;
+        player.y = playerSpawnY;
+        gameOver = false;
+    }
 })
 
 document.addEventListener("mousemove", (e) => {
