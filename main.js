@@ -32,6 +32,12 @@ const invY = canvas.height - 150;
 const invW = 200;
 const invH = 120;
 
+let gameState = "title";
+// username text cursor
+let cursorVisible = true;
+let cursorTimer = 0;
+let username = "Unknown";
+let usernameInput = "";
 let gameOver = false;
 
 const camera = {
@@ -50,8 +56,21 @@ for (let i = 0; i < 2; i++) {
     spawnFirePatch();
 }
 
+// username text cursor
+function updateCursor(deltaTime) {
+    cursorTimer += deltaTime;
+    if (cursorTimer >= 500) { // blink every 500 ms
+        cursorVisible = !cursorVisible;
+        cursorTimer = 0;
+    }
+}
+
 function update(deltaTime) {
     if (gameOver) return;
+    if (gameState === "title") {
+        updateCursor(deltaTime);
+        return;
+    }
     player.update(deltaTime, keysPressed, camera, mapWidth, mapHeight, isCollidingWithWall);
     firePatches.forEach(f => f.update(deltaTime));
     checkSwordHits();
@@ -114,6 +133,44 @@ function update(deltaTime) {
 }
 
 function draw() {
+    if (gameState === "title") {
+        ctx.fillStyle = "black";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        ctx.fillStyle = "white";
+        ctx.font = "48px Arial";
+        ctx.fillText("elor.io", canvas.width / 2 - 100, canvas.height / 2 - 80);
+
+        ctx.font = "24px Arial";
+        ctx.fillText("Enter your username:", canvas.width / 2 - 110, canvas.height / 2 - 20);
+
+        ctx.strokeStyle = "white";
+        ctx.strokeRect(canvas.width / 2 - 100, canvas.height / 2 + 10, 200, 40);
+
+        ctx.font = "20px Arial";
+        ctx.fillText(usernameInput, canvas.width / 2 - 90, canvas.height / 2 + 37);
+
+        if (cursorVisible) {
+            const textX = canvas.width / 2 - 90;
+            const textY = canvas.height / 2 + 37;
+
+            // Measure the width of the usernameInput text so cursor is positioned right after it
+            const textWidth = ctx.measureText(usernameInput).width;
+
+            ctx.strokeStyle = "white";
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(textX + textWidth + 2, textY - 20);
+            ctx.lineTo(textX + textWidth + 2, textY + 5);
+            ctx.stroke();
+        }
+
+
+        ctx.font = "18px Arial";
+        ctx.fillText("Press Enter to start", canvas.width / 2 - 80, canvas.height / 2 + 80);
+        return;
+    }
+
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.strokeStyle = "red";
     ctx.lineWidth = 5;
@@ -161,12 +218,16 @@ function draw() {
     // HP bar
     ctx.fillStyle = "red";
     ctx.fillRect(10, 10, 125, 25);
-
     ctx.fillStyle = "limegreen";
     ctx.fillRect(10, 10, (player.hp / player.maxHp) * 125, 25);
-
     ctx.strokeStyle = "black";
     ctx.strokeRect(10, 10, 125, 25);
+    ctx.fillStyle = "white";
+    ctx.font = "14px Arial";
+    ctx.textAlign = "center";
+    ctx.fillText(username, 10 + 125 / 2, 10 + 17); // center in bar
+    ctx.textAlign = "left"; // reset alignment
+
 
     // XP bar background (gray)
     ctx.fillStyle = "#555";
@@ -329,6 +390,20 @@ function gameLoop(timestamp) {
 }
 
 document.addEventListener("keydown", (e) => {
+    if (gameState === "title") {
+        if (e.key === "Backspace") {
+            usernameInput = usernameInput.slice(0, -1);
+            e.preventDefault();
+        } else if (e.key === "Enter") {
+            username = usernameInput.trim() || "Unknown";
+            gameState = "playing";
+        } else if (e.key.length === 1 && usernameInput.length < 15) {
+            usernameInput += e.key;
+            e.preventDefault();
+        }
+        return;
+    }
+
     keysPressed.add(e.key.toLowerCase());
     if (e.key == "q") player.mouseMovement = !player.mouseMovement;
     if (e.key == "z") inventoryOpen = !inventoryOpen;
@@ -340,6 +415,8 @@ document.addEventListener("keydown", (e) => {
         player.hp = player.maxHp;
         gameOver = false;
     }
+
+
 })
 
 
