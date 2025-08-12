@@ -9,8 +9,11 @@ class FirePatch {
         this.maxHp = 7;
         this.hp = this.maxHp;
         this.xp = 3;
+        this.damage = 3;
+        this.damageDelay = 500;
 
-        this.hitCooldown = 0;
+        this.hitCooldown = 0; // sword delay
+        this.lastDamageTime = 0; // body collision delay
     }
 
     update(deltaTime) {
