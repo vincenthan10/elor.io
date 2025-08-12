@@ -89,10 +89,10 @@ function update(deltaTime) {
             const dist = Math.sqrt(dx * dx + dy * dy);
             if (dist < player.radius + fire.radius) {
                 const now = performance.now();
-                if (now - player.lastDamageTime > 1000 && !player.isBlocking) { // 1s cooldown
-                    takeDamage(4);
+                if (now - fire.lastDamageTime >= fire.damageDelay && !player.isBlocking) {
+                    takeDamage(fire.damage);
                     fire.hit(player.bodyDamage);
-                    player.lastDamageTime = now;
+                    fire.lastDamageTime = now;
                     if (fire.isFading) {
                         fireShards.push(new FireShard(fire.x, fire.y));
                         player.addXP(fire.xp);
@@ -306,12 +306,24 @@ function checkSwordHits() {
     firePatches.forEach(fire => {
         if (!fire.isAlive || fire.isFading) return;
 
+        const angleOffset = 10 * Math.PI / 180;
+        const adjustedFacingAngle = player.aimAngle + angleOffset;
+
         const dx = fire.x - player.x;
         const dy = fire.y - player.y;
         const dist = Math.sqrt(dx * dx + dy * dy);
 
+        const angleToFire = Math.atan2(dy, dx);
+        // difference between facing direction and fire direction
+        let angleDiff = Math.abs(angleToFire - adjustedFacingAngle);
+        if (angleDiff > Math.PI) angleDiff = 2 * Math.PI - angleDiff;
+        // console.log("player.angle:", player.aimAngle, "angleToFire:", angleToFire, "diff:", angleDiff);
+
+
+        const swingArc = Math.PI * 72 / 180;
+
         // Sword hit range: within sword reach & in swing
-        if (dist < player.radius + fire.radius + 40) {
+        if (dist < player.radius + fire.radius + 40 && angleDiff <= swingArc) {
             fire.hit(player.damage);
             if (fire.isFading) {
                 fireShards.push(new FireShard(fire.x, fire.y));
