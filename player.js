@@ -9,7 +9,6 @@ class Player {
         this.maxHp = 10;
         this.hp = this.maxHp;
         this.hpPerc = this.hp / this.maxHp;
-        this.lastDamageTime = 0;
         this.level = 1;
         this.xp = 0;
         this.xpNeeded = 10;
@@ -51,10 +50,12 @@ class Player {
         if (this.xp >= this.xpNeeded) {
             this.xp -= this.xpNeeded;
             this.level++;
+            // Calculate current HP percentage before increasing maxHp
+            const currentHpPerc = this.hp / this.maxHp;
             this.xpNeeded *= this.XP_GROWTH_RATE;
             this.maxHp *= this.HP_GROWTH_RATE;
             this.bodyDamage *= this.BODY_DAMAGE_GROWTH_RATE;
-            this.hp = this.maxHp * this.hpPerc;
+            this.hp = this.maxHp * currentHpPerc;
             console.log(`Player level: ${this.level}`);
             console.log(`XP needed: ${this.xpNeeded}`);
             console.log(`Player HP: ${this.maxHp}`);
@@ -158,6 +159,7 @@ class Player {
     }
 
     draw(ctx, camera) {
+        if (this.hp <= 0) return;
         ctx.beginPath();
         // draws player (always centered on camera)
         ctx.arc(this.x - camera.x, this.y - camera.y, this.radius, 0, Math.PI * 2);
