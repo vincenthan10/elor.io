@@ -3,7 +3,7 @@ class Player {
         this.x = x;
         this.y = y;
         this.radius = 20;
-        this.speed = 4;
+        this.speed = 3;
         this.aimAngle = 0;
         this.fireShards = 0;
         this.maxHp = 10;
@@ -11,13 +11,14 @@ class Player {
         this.hpPerc = this.hp / this.maxHp;
         this.level = 1;
         this.xp = 0;
-        this.xpNeeded = 10;
+        this.xpNeeded = 3;
         this.bodyDamage = 1;
         this.regenUnlocked = false;
-        this.regenRate = 0.000416; // 0.5 hp per second
-        this.XP_GROWTH_RATE = 1.25;
-        this.HP_GROWTH_RATE = 1.2;
-        this.BODY_DAMAGE_GROWTH_RATE = 1.15;
+        this.regenRate = 0; // 0.5 hp per second
+        this.XP_GROWTH_RATE = 1;
+        this.HP_GROWTH_RATE = 1.1;
+        this.BODY_DAMAGE_GROWTH_RATE = 1.1;
+        this.skillPoints = 0;
 
         // Sword animation and stats
         this.isSwinging = false;
@@ -50,11 +51,15 @@ class Player {
         if (this.xp >= this.xpNeeded) {
             this.xp -= this.xpNeeded;
             this.level++;
+
+            const pointsGained = Math.max(Math.floor(this.level / 10), 1);
+            this.skillPoints += pointsGained;
+
             // Calculate current HP percentage before increasing maxHp
             const currentHpPerc = this.hp / this.maxHp;
             this.xpNeeded *= this.XP_GROWTH_RATE;
-            this.maxHp *= this.HP_GROWTH_RATE;
-            this.bodyDamage *= this.BODY_DAMAGE_GROWTH_RATE;
+            this.maxHp += 1 * Math.pow(this.HP_GROWTH_RATE, this.level - 1);
+            this.bodyDamage += 0.1 * Math.pow(this.BODY_DAMAGE_GROWTH_RATE, this.level - 1);
             this.hp = this.maxHp * currentHpPerc;
             console.log(`Player level: ${this.level}`);
             console.log(`XP needed: ${this.xpNeeded}`);
@@ -65,6 +70,7 @@ class Player {
 
         if (this.level === 2) {
             this.regenUnlocked = true;
+            this.regenRate = 0.000416;
         }
     }
 
@@ -254,5 +260,12 @@ class Player {
         ctx.closePath();
         ctx.fill();
         ctx.restore();
+
+        // HP bar
+        ctx.fillStyle = "red";
+        ctx.fillRect(this.x - camera.x - this.radius, this.y - camera.y + this.radius * 1.25, this.radius * 2, this.radius / 5);
+
+        ctx.fillStyle = "limegreen";
+        ctx.fillRect(this.x - camera.x - this.radius, this.y - camera.y + this.radius * 1.25, (this.hp / this.maxHp) * (this.radius * 2), this.radius / 5);
     }
 }
