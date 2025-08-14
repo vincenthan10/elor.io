@@ -13,7 +13,8 @@ class FirePatch {
         this.damageDelay = 500;
 
         this.hitCooldown = 0; // sword delay
-        this.lastDamageTime = 0; // body collision delay
+        this.bodyHitCooldown = 0; // body collision delay
+        this.lastDamageTime = 0; // for body collision delay
     }
 
     update(deltaTime) {
@@ -26,6 +27,9 @@ class FirePatch {
 
         if (this.hitCooldown > 0) {
             this.hitCooldown -= deltaTime;
+        }
+        if (this.bodyHitCooldown > 0) {
+            this.bodyHitCooldown -= deltaTime;
         }
     }
 
@@ -53,10 +57,18 @@ class FirePatch {
 
     }
 
-    hit(damage) {
-        if (this.isFading || this.hitCooldown > 0) return;
+    hit(damage, sword, body) {
+        if (this.isFading) return;
+        if (sword) {
+            if (this.hitCooldown > 0) return;
+            this.hitCooldown = 250;
+        }
+        if (body) {
+            if (this.bodyHitCooldown > 0) return;
+            this.bodyHitCooldown = 500;
+        }
         this.hp -= damage;
-        this.hitCooldown = 250;
+
         if (this.hp <= 0) {
             this.hp = 0;
             this.isFading = true;
