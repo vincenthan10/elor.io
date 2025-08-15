@@ -1,15 +1,26 @@
 class FirePatch {
-    constructor(x, y) {
+
+    constructor(x, y, rarityKey = null) {
         this.x = x;
         this.y = y;
-        this.radius = 25;
+
+        const rarity = rarityKey ? rarityTable.find(r => r.key === rarityKey) : pickRarityByWeight();
+        this.rarity = rarity;
+        this.rarityColor = this.rarity.color;
+
+        const baseRadius = 20;
+        const baseHp = 14;
+        const baseDamage = 4;
+        const baseXp = 5;
+
+        this.radius = Math.round(baseRadius * rarity.sizeMult);
         this.isAlive = true;
         this.isFading = false;
         this.fadeAlpha = 1; // for fade-out animation
-        this.maxHp = 7;
+        this.maxHp = Math.max(1, Math.round(baseHp * rarity.hpMult));
         this.hp = this.maxHp;
-        this.xp = 3;
-        this.damage = 3;
+        this.xp = Math.max(1, Math.round(baseXp * rarity.xpMult));
+        this.damage = Math.max(1, Math.round(baseDamage * rarity.dmgMult));
         this.damageDelay = 500;
 
         this.hitCooldown = 0; // sword delay
@@ -50,10 +61,18 @@ class FirePatch {
 
         // HP bar
         ctx.fillStyle = "red";
-        ctx.fillRect(this.x - camera.x - this.radius, this.y - camera.y + this.radius * 1.25, this.radius * 2, this.radius / 5);
+        ctx.fillRect(this.x - camera.x - this.radius, this.y - camera.y + this.radius * 1.25, this.radius * 1.4, this.radius / 5);
 
         ctx.fillStyle = "limegreen";
-        ctx.fillRect(this.x - camera.x - this.radius, this.y - camera.y + this.radius * 1.25, (this.hp / this.maxHp) * (this.radius * 2), this.radius / 5);
+        ctx.fillRect(this.x - camera.x - this.radius, this.y - camera.y + this.radius * 1.25, (this.hp / this.maxHp) * (this.radius * 1.4), this.radius / 5);
+
+        // Rarity text to right of bar (color-coded)
+        ctx.font = `${Math.round(this.radius / 5 + 3)}px Arial`;
+        ctx.textBaseline = "middle";
+        ctx.textAlign = "left";
+        ctx.fillStyle = this.rarityColor;
+        ctx.fillText(this.rarity.key, this.x - camera.x - this.radius + this.radius * 1.4 + 6, this.y - camera.y + this.radius * 1.25 + this.radius / 5 / 2);
+
 
     }
 
