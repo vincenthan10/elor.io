@@ -8,6 +8,17 @@ const player = new Player(400, 300);
 const playerSpawnX = 400;
 const playerSpawnY = 300;
 
+const rarityTable = [
+    { key: "Common", weight: 50, sizeMult: 1.0, hpMult: 1.0, dmgMult: 1.0, xpMult: 1.0, color: "#4fbe53ff" },
+    { key: "Unusual", weight: 25, sizeMult: 1.2, hpMult: 2.1, dmgMult: 1.9, xpMult: 2, color: "#f1de37ff" },
+    { key: "Rare", weight: 13, sizeMult: 1.4, hpMult: 4.6, dmgMult: 3.6, xpMult: 4.1, color: "#2c1bc6ff" },
+    { key: "Epic", weight: 6.5, sizeMult: 1.7, hpMult: 11.9, dmgMult: 7, xpMult: 9.4, color: "#720bf0ff" },
+    { key: "Legendary", weight: 3, sizeMult: 2.5, hpMult: 35, dmgMult: 13.5, xpMult: 24.2, color: "#d5502bff" },
+    { key: "Mythic", weight: 1.5, sizeMult: 4, hpMult: 120, dmgMult: 26, xpMult: 73, color: "#04d3daff" },
+    { key: "Fabled", weight: 0.7, sizeMult: 6.5, hpMult: 500, dmgMult: 50, xpMult: 275, color: "#ff13a4ff" },
+    { key: "Supreme", weight: 0.3, sizeMult: 10, hpMult: 3000, dmgMult: 125, xpMult: 1583, color: "#666666" }
+]
+
 const firePatches = [
     new FirePatch(600, 400),
     new FirePatch(900, 700)
@@ -59,7 +70,7 @@ const upgradeMultipliers = {
     hp: 1.25,
     bodyDamage: 1.375,
     speed: 1.1,
-    regen: 2
+    regen: 1.5
 }
 const maxUpgrades = {
     hp: 5,
@@ -452,8 +463,20 @@ function checkSwordHits() {
     })
 }
 
+function pickRarityByWeight() {
+    const total = rarityTable.reduce((s, r) => s + r.weight, 0);
+    let roll = Math.random() * total;
+    for (const r of rarityTable) {
+        if (roll < r.weight) return r;
+        roll -= r.weight;
+    }
+    return rarityTable[0];
+}
+
 function spawnFirePatch() {
     if (firePatches.length >= FIRE_CAP) return;
+    const rarityPicked = pickRarityByWeight();
+
 
     let tries = 0;
     while (tries < 50) { // avoid infinite loop if map is crowded
@@ -470,7 +493,7 @@ function spawnFirePatch() {
         // 2. Avoid spawning inside walls
         let insideWall = false;
         for (const wall of walls) {
-            if (x > wall.x - 25 && x < wall.x + wall.width + 25 && y > wall.y - 25 && y < wall.y + wall.height + 25) {
+            if (x > wall.x - 30 * rarityPicked.sizeMult && x < wall.x + wall.width + 30 * rarityPicked.sizeMult && y > wall.y - 30 * rarityPicked.sizeMult && y < wall.y + wall.height + 30 * rarityPicked.sizeMult) {
                 insideWall = true;
                 break;
             }
@@ -494,8 +517,8 @@ function spawnFirePatch() {
         }
 
         // Valid location found
-        firePatches.push(new FirePatch(x, y));
-        console.log(firePatches.length);
+        firePatches.push(new FirePatch(x, y, rarityPicked.key));
+        console.log("spawned", rarityPicked.key);
         return;
     }
 }
@@ -506,7 +529,7 @@ function takeDamage(amount) {
         player.hp = 0;
         gameOver = true;
     }
-    console.log(`Player HP: ${player.hp}/${player.maxHp}`);
+    // console.log(`Player HP: ${player.hp}/${player.maxHp}`);
 }
 
 
