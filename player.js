@@ -11,11 +11,11 @@ class Player {
         this.hpPerc = this.hp / this.maxHp;
         this.level = 1;
         this.xp = 0;
-        this.xpNeeded = 3;
+        this.xpNeeded = 10;
         this.bodyDamage = 1;
         this.regenUnlocked = false;
         this.regenRate = 0; // 0.5 hp per second
-        this.XP_GROWTH_RATE = 1;
+        this.XP_GROWTH_RATE = 1.15;
         this.HP_GROWTH_RATE = 1.1;
         this.BODY_DAMAGE_GROWTH_RATE = 1.1;
         this.skillPoints = 0;
@@ -58,13 +58,13 @@ class Player {
             // Calculate current HP percentage before increasing maxHp
             const currentHpPerc = this.hp / this.maxHp;
             this.xpNeeded *= this.XP_GROWTH_RATE;
-            this.maxHp += 1 * Math.pow(this.HP_GROWTH_RATE, this.level - 1);
-            this.bodyDamage += 0.1 * Math.pow(this.BODY_DAMAGE_GROWTH_RATE, this.level - 1);
+            this.maxHp += 0.8 * Math.pow(this.HP_GROWTH_RATE, this.level - 1);
+            this.bodyDamage += 0.05 * Math.pow(this.BODY_DAMAGE_GROWTH_RATE, this.level - 1);
             this.hp = this.maxHp * currentHpPerc;
-            console.log(`Player level: ${this.level}`);
-            console.log(`XP needed: ${this.xpNeeded}`);
-            console.log(`Player HP: ${this.maxHp}`);
-            console.log(`Player Body Damage: ${this.bodyDamage}`);
+            // console.log(`Player level: ${this.level}`);
+            // console.log(`XP needed: ${this.xpNeeded}`);
+            // console.log(`Player HP: ${this.maxHp}`);
+            // console.log(`Player Body Damage: ${this.bodyDamage}`);
         }
 
 
