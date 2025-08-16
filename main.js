@@ -8,15 +8,18 @@ const player = new Player(400, 300);
 const playerSpawnX = 400;
 const playerSpawnY = 300;
 
+let mouseLeft = false;
+let mouseRight = false;
+
 const rarityTable = [
     { key: "Common", weight: 50, sizeMult: 1.0, hpMult: 1.0, dmgMult: 1.0, xpMult: 1.0, color: "#4fbe53ff" },
-    { key: "Unusual", weight: 25, sizeMult: 1.2, hpMult: 2.1, dmgMult: 1.9, xpMult: 2, color: "#f1de37ff" },
-    { key: "Rare", weight: 13, sizeMult: 1.4, hpMult: 4.6, dmgMult: 3.6, xpMult: 4.1, color: "#2c1bc6ff" },
-    { key: "Epic", weight: 6.5, sizeMult: 1.7, hpMult: 11.9, dmgMult: 7, xpMult: 9.4, color: "#720bf0ff" },
-    { key: "Legendary", weight: 3, sizeMult: 2.5, hpMult: 35, dmgMult: 13.5, xpMult: 24.2, color: "#d5502bff" },
-    { key: "Mythic", weight: 1.5, sizeMult: 4, hpMult: 120, dmgMult: 26, xpMult: 73, color: "#04d3daff" },
-    { key: "Fabled", weight: 0.7, sizeMult: 6.5, hpMult: 500, dmgMult: 50, xpMult: 275, color: "#ff13a4ff" },
-    { key: "Supreme", weight: 0.3, sizeMult: 10, hpMult: 3000, dmgMult: 125, xpMult: 1583, color: "#666666" }
+    { key: "Unusual", weight: 25, sizeMult: 1.2, hpMult: 1.2, dmgMult: 1.1, xpMult: 2, color: "#f1de37ff" }, // 2.1, 1.9
+    { key: "Rare", weight: 13, sizeMult: 1.4, hpMult: 1.4, dmgMult: 1.3, xpMult: 4.1, color: "#2c1bc6ff" }, // 4.6, 3.6
+    { key: "Epic", weight: 6.5, sizeMult: 1.7, hpMult: 1.7, dmgMult: 1.6, xpMult: 9.4, color: "#720bf0ff" }, // 11.9, 7
+    { key: "Legendary", weight: 3, sizeMult: 2.5, hpMult: 2.5, dmgMult: 2, xpMult: 24.2, color: "#d5502bff" }, // 35, 13.5
+    { key: "Mythic", weight: 1.5, sizeMult: 4, hpMult: 4, dmgMult: 2.5, xpMult: 73, color: "#04d3daff" }, // 120, 26
+    { key: "Fabled", weight: 0.7, sizeMult: 6.5, hpMult: 6.5, dmgMult: 3.1, xpMult: 275, color: "#ff13a4ff" }, // 500, 60
+    { key: "Supreme", weight: 0.3, sizeMult: 10, hpMult: 10, dmgMult: 3.8, xpMult: 1583, color: "#666666" } // 3000, 125
 ]
 
 const firePatches = [
@@ -62,21 +65,33 @@ player.upgrades = {
 }
 const baseUpgradeCosts = {
     hp: 1,
-    bodyDamage: 1,
+    bodyDamage: 2,
     speed: 1,
-    regen: 1
+    regen: 2
+}
+const costIncreases = {
+    hp: 1,
+    bodyDamage: 1,
+    speed: 2,
+    regen: 2
+}
+const statGains = {
+    hp: 5,
+    bodyDamage: 0.5,
+    speed: 0.2,
+    regen: 0.4
 }
 const upgradeMultipliers = {
-    hp: 1.25,
-    bodyDamage: 1.375,
-    speed: 1.1,
-    regen: 1.5
+    hp: 1.4,
+    bodyDamage: 1.6,
+    speed: 1.35,
+    regen: 2
 }
 const maxUpgrades = {
-    hp: 5,
-    bodyDamage: 5,
-    speed: 3,
-    regen: 6
+    hp: 8,
+    bodyDamage: 6,
+    speed: 5,
+    regen: 9
 }
 
 let gameState = "title";
@@ -119,6 +134,12 @@ function update(deltaTime) {
         return;
     }
     player.update(deltaTime, keysPressed, camera, mapWidth, mapHeight, isCollidingWithWall);
+    if (mouseLeft) {
+        startSwordSwing();
+    }
+    if (mouseRight) {
+        startShieldBlock();
+    }
     firePatches.forEach(f => f.update(deltaTime));
     checkSwordHits();
     // Remove dead fires
@@ -391,7 +412,7 @@ let statButtons = {};
 
 // Calculate cost based on current level
 function getUpgradeCost(stat) {
-    return baseUpgradeCosts[stat] + player.upgrades[stat]; // simple scaling: +1 per level
+    return baseUpgradeCosts[stat] + costIncreases[stat] * player.upgrades[stat];
 }
 
 function isCollidingWithWall(x, y) {
@@ -463,19 +484,52 @@ function checkSwordHits() {
     })
 }
 
-function pickRarityByWeight() {
+function pickRarityByWeight(playerLevel) {
+    const adjustedRarityTable = rarityTable.map(r => {
+        let adjustedWeight = r.weight;
+        if (r.name === "Common") {
+            adjustedWeight = r.weight * Math.max(1 - player.level * 0.15, 0.1);
+        }
+        if (r.name === "Unusual") {
+            adjustedWeight = r.weight * (1 + playerLevel * 0.05);
+        }
+        if (r.name === "Rare") {
+            adjustedWeight = r.weight * (1 + playerLevel * 0.1);
+        }
+        if (r.name === "Epic") {
+            adjustedWeight = r.weight * (1 + playerLevel * 0.15);
+        }
+        if (r.name === "Legendary") {
+            adjustedWeight = r.weight * (1 + playerLevel * 0.2);
+        }
+        if (r.name === "Mythic") {
+            adjustedWeight = r.weight * (1 + playerLevel * 0.25);
+        }
+        if (r.name === "Fabled") {
+            adjustedWeight = r.weight * (1 + playerLevel * 0.3);
+        }
+        if (r.name === "Supreme") {
+            adjustedWeight = r.weight * (1 + playerLevel * 0.35);
+        }
+        return { ...r, weight: adjustedWeight };
+    })
+
     const total = rarityTable.reduce((s, r) => s + r.weight, 0);
     let roll = Math.random() * total;
     for (const r of rarityTable) {
-        if (roll < r.weight) return r;
+        if (roll < r.weight) {
+            console.log(r.key, r.weight);
+            return r;
+        }
         roll -= r.weight;
     }
-    return rarityTable[0];
+    console.log(r.key, r.weight);
+    return adjustedRarityTable[0];
 }
 
 function spawnFirePatch() {
     if (firePatches.length >= FIRE_CAP) return;
-    const rarityPicked = pickRarityByWeight();
+    const rarityPicked = pickRarityByWeight(player.level);
 
 
     let tries = 0;
@@ -517,8 +571,8 @@ function spawnFirePatch() {
         }
 
         // Valid location found
-        firePatches.push(new FirePatch(x, y, rarityPicked.key));
-        console.log("spawned", rarityPicked.key);
+        firePatches.push(new FirePatch(x, y, rarityPicked.name));
+        //console.log("spawned", rarityPicked.key, rarityPicked.weight);
         return;
     }
 }
@@ -595,22 +649,30 @@ canvas.addEventListener("mousedown", (e) => {
     const mouseY = e.offsetY;
 
     // Check if inside button
-    if (e.button === 0 && !gameOver) {
+    if (e.button === 0 && !gameOver && gameState === "playing") {
         if (mouseX >= inventoryButton.x && mouseX <= inventoryButton.x + inventoryButton.width && mouseY >= inventoryButton.y && mouseY <= inventoryButton.y + inventoryButton.height) {
+            statsOpen = false;
             inventoryOpen = true;
             return; // returns so that it doesn't swing sword or block
+        } else if (mouseX >= statsButton.x && mouseX <= statsButton.x + statsButton.width && mouseY >= statsButton.y && mouseY <= statsButton.y + statsButton.height) {
+            inventoryOpen = false;
+            statsOpen = true;
+            return;
         } else {
             if (inventoryOpen && !(mouseX >= invX && mouseX <= invX + invW && mouseY >= invY && mouseY <= invY + invH)) {
                 inventoryOpen = false;
                 return;
-            } else {
-                startSwordSwing();
+            } else if (statsOpen && !(mouseX >= stX && mouseX <= stX + stW && mouseY >= stY && mouseY <= stY + stH)) {
+                statsOpen = false;
+                return;
+            } else if (!inventoryOpen && !statsOpen) {
+                mouseLeft = true;
             }
         }
     }
 
-    if (e.button === 2) {
-        startShieldBlock();
+    if (e.button === 2 && !gameOver && !inventoryOpen && !statsOpen) {
+        mouseRight = true;
     }
 
 
@@ -648,6 +710,11 @@ document.addEventListener("mousemove", (e) => {
     // console.log(length);
 })
 
+window.addEventListener("mouseup", (e) => {
+    if (e.button === 0) mouseLeft = false;
+    if (e.button === 2) mouseRight = false;
+});
+
 document.addEventListener("click", (e) => {
     const rect = canvas.getBoundingClientRect();
     const mouseX = e.clientX - rect.left;
@@ -667,14 +734,14 @@ document.addEventListener("click", (e) => {
                 switch (stat) {
                     case "hp":
                         let hpPerc = player.hp / player.maxHp;
-                        player.maxHp *= upgradeMultipliers.hp;
+                        player.maxHp += statGains.hp * Math.pow(upgradeMultipliers.hp, player.upgrades[stat] - 1);
                         player.hp = player.maxHp * hpPerc;
                         break;
                     case "bodyDamage":
-                        player.bodyDamage *= upgradeMultipliers.bodyDamage;
+                        player.bodyDamage += statGains.bodyDamage * Math.pow(upgradeMultipliers.bodyDamage, player.upgrades[stat] - 1);
                         break;
                     case "speed":
-                        player.speed *= upgradeMultipliers.speed;
+                        player.speed += statGains.speed * Math.pow(upgradeMultipliers.speed, player.upgrades[stat] - 1);
                         break;
                     case "regen":
                         player.regenRate *= upgradeMultipliers.regen;
