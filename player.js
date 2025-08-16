@@ -3,7 +3,7 @@ class Player {
         this.x = x;
         this.y = y;
         this.radius = 20;
-        this.speed = 3;
+        this.speed = 2.5;
         this.aimAngle = 0;
         this.fireShards = 0;
         this.maxHp = 10;
@@ -15,9 +15,9 @@ class Player {
         this.bodyDamage = 1;
         this.regenUnlocked = false;
         this.regenRate = 0; // 0.5 hp per second
-        this.XP_GROWTH_RATE = 1.15;
-        this.HP_GROWTH_RATE = 1.1;
-        this.BODY_DAMAGE_GROWTH_RATE = 1.1;
+        this.XP_GROWTH_RATE = 1.1;
+        this.HP_GROWTH_RATE = 1.04;
+        this.BODY_DAMAGE_GROWTH_RATE = 1.02;
         this.skillPoints = 0;
 
         // Sword animation and stats
@@ -52,14 +52,15 @@ class Player {
             this.xp -= this.xpNeeded;
             this.level++;
 
-            const pointsGained = Math.max(Math.floor(this.level / 10), 1);
+            const pointsGained = Math.max(Math.floor(this.level / 20), 1);
             this.skillPoints += pointsGained;
 
             // Calculate current HP percentage before increasing maxHp
             const currentHpPerc = this.hp / this.maxHp;
             this.xpNeeded *= this.XP_GROWTH_RATE;
-            this.maxHp += 0.8 * Math.pow(this.HP_GROWTH_RATE, this.level - 1);
-            this.bodyDamage += 0.05 * Math.pow(this.BODY_DAMAGE_GROWTH_RATE, this.level - 1);
+            this.maxHp += 1 * Math.pow(this.HP_GROWTH_RATE, this.level - 1);
+            this.bodyDamage += 0.1 * Math.pow(this.BODY_DAMAGE_GROWTH_RATE, this.level - 1);
+            this.damage += 0.15 * Math.pow(this.BODY_DAMAGE_GROWTH_RATE, this.level - 1);
             this.hp = this.maxHp * currentHpPerc;
             // console.log(`Player level: ${this.level}`);
             // console.log(`XP needed: ${this.xpNeeded}`);
