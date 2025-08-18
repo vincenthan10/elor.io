@@ -13,13 +13,13 @@ let mouseRight = false;
 
 const rarityTable = [
     { key: "Common", weight: 50, sizeMult: 1.0, hpMult: 1.0, dmgMult: 1.0, xpMult: 1.0, color: "#4fbe53ff" },
-    { key: "Unusual", weight: 25, sizeMult: 1.2, hpMult: 1.2, dmgMult: 1.1, xpMult: 2, color: "#f1de37ff" }, // 2.1, 1.9
-    { key: "Rare", weight: 13, sizeMult: 1.4, hpMult: 1.4, dmgMult: 1.3, xpMult: 4.1, color: "#2c1bc6ff" }, // 4.6, 3.6
-    { key: "Epic", weight: 6.5, sizeMult: 1.7, hpMult: 1.7, dmgMult: 1.6, xpMult: 9.4, color: "#720bf0ff" }, // 11.9, 7
-    { key: "Legendary", weight: 3, sizeMult: 2.5, hpMult: 2.5, dmgMult: 2, xpMult: 24.2, color: "#d5502bff" }, // 35, 13.5
-    { key: "Mythic", weight: 1.5, sizeMult: 4, hpMult: 4, dmgMult: 2.5, xpMult: 73, color: "#04d3daff" }, // 120, 26
-    { key: "Fabled", weight: 0.7, sizeMult: 6.5, hpMult: 6.5, dmgMult: 3.1, xpMult: 275, color: "#ff13a4ff" }, // 500, 60
-    { key: "Supreme", weight: 0.3, sizeMult: 10, hpMult: 10, dmgMult: 3.8, xpMult: 1583, color: "#666666" } // 3000, 125
+    { key: "Unusual", weight: 25, sizeMult: 1.2, hpMult: 1.4, dmgMult: 1.2, xpMult: 2, color: "#f1de37ff" }, // 2.1, 1.9
+    { key: "Rare", weight: 13, sizeMult: 1.4, hpMult: 1.8, dmgMult: 1.6, xpMult: 4.1, color: "#2c1bc6ff" }, // 4.6, 3.6
+    { key: "Epic", weight: 6.5, sizeMult: 1.7, hpMult: 2.4, dmgMult: 2.2, xpMult: 9.4, color: "#720bf0ff" }, // 11.9, 7
+    { key: "Legendary", weight: 3, sizeMult: 2.5, hpMult: 4, dmgMult: 3, xpMult: 24.2, color: "#d5502bff" }, // 35, 13.5
+    { key: "Mythic", weight: 1.5, sizeMult: 4, hpMult: 7, dmgMult: 4, xpMult: 73, color: "#04d3daff" }, // 120, 26
+    { key: "Fabled", weight: 0.7, sizeMult: 6.5, hpMult: 12, dmgMult: 5.2, xpMult: 275, color: "#ff13a4ff" }, // 500, 60
+    { key: "Supreme", weight: 0.3, sizeMult: 10, hpMult: 20, dmgMult: 6.6, xpMult: 1583, color: "#666666" } // 3000, 125
 ]
 
 const firePatches = [
@@ -85,7 +85,7 @@ const upgradeMultipliers = {
     hp: 1.4,
     bodyDamage: 1.6,
     speed: 1.35,
-    regen: 2
+    regen: 1.75
 }
 const maxUpgrades = {
     hp: 8,
@@ -487,43 +487,43 @@ function checkSwordHits() {
 function pickRarityByWeight(playerLevel) {
     const adjustedRarityTable = rarityTable.map(r => {
         let adjustedWeight = r.weight;
-        if (r.name === "Common") {
-            adjustedWeight = r.weight * Math.max(1 - player.level * 0.15, 0.1);
+        if (r.key === "Common") {
+            adjustedWeight = r.weight * Math.max(1 - (playerLevel - 1) * 0.03, 0.01);
         }
-        if (r.name === "Unusual") {
-            adjustedWeight = r.weight * (1 + playerLevel * 0.05);
+        if (r.key === "Unusual") {
+            adjustedWeight = r.weight * (1 + (playerLevel - 1) * 0.02);
         }
-        if (r.name === "Rare") {
-            adjustedWeight = r.weight * (1 + playerLevel * 0.1);
+        if (r.key === "Rare") {
+            adjustedWeight = r.weight * (1 + (playerLevel - 1) * 0.08);
         }
-        if (r.name === "Epic") {
-            adjustedWeight = r.weight * (1 + playerLevel * 0.15);
+        if (r.key === "Epic") {
+            adjustedWeight = r.weight * (1 + (playerLevel - 1) * 0.14);
         }
-        if (r.name === "Legendary") {
-            adjustedWeight = r.weight * (1 + playerLevel * 0.2);
+        if (r.key === "Legendary") {
+            adjustedWeight = r.weight * (1 + (playerLevel - 1) * 0.2);
         }
-        if (r.name === "Mythic") {
-            adjustedWeight = r.weight * (1 + playerLevel * 0.25);
+        if (r.key === "Mythic") {
+            adjustedWeight = r.weight * (1 + (playerLevel - 1) * 0.26);
         }
-        if (r.name === "Fabled") {
-            adjustedWeight = r.weight * (1 + playerLevel * 0.3);
+        if (r.key === "Fabled") {
+            adjustedWeight = r.weight * (1 + (playerLevel - 1) * 0.32);
         }
-        if (r.name === "Supreme") {
-            adjustedWeight = r.weight * (1 + playerLevel * 0.35);
+        if (r.key === "Supreme") {
+            adjustedWeight = r.weight * (1 + (playerLevel - 1) * 0.38);
         }
         return { ...r, weight: adjustedWeight };
     })
 
-    const total = rarityTable.reduce((s, r) => s + r.weight, 0);
+    const total = adjustedRarityTable.reduce((s, r) => s + r.weight, 0);
     let roll = Math.random() * total;
-    for (const r of rarityTable) {
+    for (const r of adjustedRarityTable) {
         if (roll < r.weight) {
-            console.log(r.key, r.weight);
+            // console.log(`🔥 ${r.key} ${r.weight.toFixed(2)}`);
             return r;
         }
         roll -= r.weight;
     }
-    console.log(r.key, r.weight);
+    // console.log(`🔥 (fallback): ${adjustedRarityTable[0].key}  ${adjustedRarityTable[0].weight.toFixed(2)}`);
     return adjustedRarityTable[0];
 }
 
@@ -571,8 +571,8 @@ function spawnFirePatch() {
         }
 
         // Valid location found
-        firePatches.push(new FirePatch(x, y, rarityPicked.name));
-        //console.log("spawned", rarityPicked.key, rarityPicked.weight);
+        firePatches.push(new FirePatch(x, y, rarityPicked.key));
+        console.log("spawned", rarityPicked.key, rarityPicked.weight);
         return;
     }
 }
@@ -626,8 +626,8 @@ document.addEventListener("keydown", (e) => {
             inventoryOpen = false;
         }
     }
-    if (e.code == "Space") startSwordSwing();
-    if (e.code == "ShiftLeft" || e.code == "ShiftRight") startShieldBlock();
+    if (e.code == "Space") mouseLeft = true;
+    if (e.code == "ShiftLeft" || e.code == "ShiftRight") mouseRight = true;
     if (e.code == "Enter" && gameOver) {
         player.x = playerSpawnX;
         player.y = playerSpawnY;
