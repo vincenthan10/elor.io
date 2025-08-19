@@ -12,14 +12,14 @@ let mouseLeft = false;
 let mouseRight = false;
 
 const rarityTable = [
-    { key: "Common", weight: 50, sizeMult: 1.0, hpMult: 1.0, dmgMult: 1.0, xpMult: 1.0, color: "#4fbe53ff" },
-    { key: "Unusual", weight: 25, sizeMult: 1.2, hpMult: 1.4, dmgMult: 1.2, xpMult: 2, color: "#f1de37ff" }, // 2.1, 1.9
-    { key: "Rare", weight: 13, sizeMult: 1.4, hpMult: 1.8, dmgMult: 1.6, xpMult: 4.1, color: "#2c1bc6ff" }, // 4.6, 3.6
-    { key: "Epic", weight: 6.5, sizeMult: 1.7, hpMult: 2.4, dmgMult: 2.2, xpMult: 9.4, color: "#720bf0ff" }, // 11.9, 7
-    { key: "Legendary", weight: 3, sizeMult: 2.5, hpMult: 4, dmgMult: 3, xpMult: 24.2, color: "#d5502bff" }, // 35, 13.5
-    { key: "Mythic", weight: 1.5, sizeMult: 4, hpMult: 7, dmgMult: 4, xpMult: 73, color: "#04d3daff" }, // 120, 26
-    { key: "Fabled", weight: 0.7, sizeMult: 6.5, hpMult: 12, dmgMult: 5.2, xpMult: 275, color: "#ff13a4ff" }, // 500, 60
-    { key: "Supreme", weight: 0.3, sizeMult: 10, hpMult: 20, dmgMult: 6.6, xpMult: 1583, color: "#666666" } // 3000, 125
+    { key: "Common", weight: 50, sizeMult: 1.0, hpMult: 1.0, dmgMult: 1.0, xpMult: 1.0, drops: 1, color: "#4fbe53ff" },
+    { key: "Unusual", weight: 25, sizeMult: 1.2, hpMult: 1.8, dmgMult: 1.6, xpMult: 2.0, drops: 1, color: "#f1de37ff" }, // 2.1, 1.9
+    { key: "Rare", weight: 13, sizeMult: 1.4, hpMult: 4, dmgMult: 3, xpMult: 4.1, drops: 1, color: "#2c1bc6ff" }, // 4.6, 3.6
+    { key: "Epic", weight: 6.5, sizeMult: 1.7, hpMult: 8.2, dmgMult: 4.8, xpMult: 9.4, drops: 2, color: "#720bf0ff" }, // 11.9, 7
+    { key: "Legendary", weight: 3, sizeMult: 2.5, hpMult: 20, dmgMult: 9, xpMult: 24.2, drops: 4, color: "#d5502bff" }, // 35, 13.5
+    { key: "Mythic", weight: 1.5, sizeMult: 4, hpMult: 60, dmgMult: 16, xpMult: 73, drops: 7, color: "#04d3daff" }, // 120, 26
+    { key: "Fabled", weight: 0.7, sizeMult: 6.5, hpMult: 200, dmgMult: 30, xpMult: 275, drops: 14, color: "#ff13a4ff" }, // 500, 60
+    { key: "Supreme", weight: 0.3, sizeMult: 10, hpMult: 1200, dmgMult: 60, xpMult: 1583, drops: 50, color: "#666666" } // 3000, 125
 ]
 
 const firePatches = [
@@ -164,7 +164,12 @@ function update(deltaTime) {
                     fire.hit(player.bodyDamage, false, true);
                     fire.lastDamageTime = now;
                     if (fire.isFading) {
-                        fireShards.push(new FireShard(fire.x, fire.y));
+                        for (let i = 0; i < fire.rarity.drops; i++) {
+                            const offsetX = (Math.random() - 0.5) * 20;
+                            const offsetY = (Math.random() - 0.5) * 20;
+                            fireShards.push(new FireShard(fire.x + offsetX, fire.y + offsetY));
+                            player.addXP(10);
+                        }
                         player.addXP(fire.xp);
                     }
                 }
@@ -477,7 +482,10 @@ function checkSwordHits() {
         if (dist < player.radius + fire.radius + 40 && angleDiff <= swingArc) {
             fire.hit(player.damage, true, false);
             if (fire.isFading) {
-                fireShards.push(new FireShard(fire.x, fire.y));
+                for (let i = 0; i < fire.rarity.drops; i++) {
+                    fireShards.push(new FireShard(fire.x, fire.y));
+                    player.addXP(10);
+                }
                 player.addXP(fire.xp);
             }
         }
@@ -488,28 +496,28 @@ function pickRarityByWeight(playerLevel) {
     const adjustedRarityTable = rarityTable.map(r => {
         let adjustedWeight = r.weight;
         if (r.key === "Common") {
-            adjustedWeight = r.weight * Math.max(1 - (playerLevel - 1) * 0.03, 0.01);
+            adjustedWeight = r.weight * Math.max(1 - (playerLevel - 1) * 0.02, 0.01);
         }
         if (r.key === "Unusual") {
             adjustedWeight = r.weight * (1 + (playerLevel - 1) * 0.02);
         }
         if (r.key === "Rare") {
-            adjustedWeight = r.weight * (1 + (playerLevel - 1) * 0.08);
+            adjustedWeight = r.weight * (1 + (playerLevel - 1) * 0.06);
         }
         if (r.key === "Epic") {
-            adjustedWeight = r.weight * (1 + (playerLevel - 1) * 0.14);
+            adjustedWeight = r.weight * (1 + (playerLevel - 1) * 0.1);
         }
         if (r.key === "Legendary") {
-            adjustedWeight = r.weight * (1 + (playerLevel - 1) * 0.2);
+            adjustedWeight = r.weight * (1 + (playerLevel - 1) * 0.12);
         }
         if (r.key === "Mythic") {
-            adjustedWeight = r.weight * (1 + (playerLevel - 1) * 0.26);
+            adjustedWeight = r.weight * (1 + (playerLevel - 1) * 0.14);
         }
         if (r.key === "Fabled") {
-            adjustedWeight = r.weight * (1 + (playerLevel - 1) * 0.32);
+            adjustedWeight = r.weight * (1 + (playerLevel - 1) * 0.15);
         }
         if (r.key === "Supreme") {
-            adjustedWeight = r.weight * (1 + (playerLevel - 1) * 0.38);
+            adjustedWeight = r.weight * (1 + (playerLevel - 1) * 0.16);
         }
         return { ...r, weight: adjustedWeight };
     })
@@ -642,6 +650,8 @@ document.addEventListener("keydown", (e) => {
 
 document.addEventListener("keyup", (e) => {
     keysPressed.delete(e.key.toLowerCase());
+    if (e.code === "Space") mouseLeft = false;
+    if (e.code === "ShiftLeft" || e.code === "ShiftRight") mouseRight = false;
 })
 
 canvas.addEventListener("mousedown", (e) => {
