@@ -54,41 +54,47 @@ const statsButton = {
     height: 30
 }
 const stX = 130;
-const stY = canvas.height - 200;
+const stY = canvas.height - 220;
 const stW = 280;
-const stH = 170;
+const stH = 200;
 player.upgrades = {
     hp: 0,
+    strength: 0,
     bodyDamage: 0,
     speed: 0,
     regen: 0
 }
 const baseUpgradeCosts = {
     hp: 1,
+    strength: 2,
     bodyDamage: 2,
     speed: 1,
     regen: 2
 }
 const costIncreases = {
     hp: 1,
+    strength: 2,
     bodyDamage: 1,
     speed: 2,
     regen: 2
 }
 const statGains = {
-    hp: 5,
+    hp: 4,
+    strength: 0.8,
     bodyDamage: 0.5,
     speed: 0.2,
     regen: 0.4
 }
 const upgradeMultipliers = {
-    hp: 1.4,
+    hp: 1.3,
+    strength: 1.35,
     bodyDamage: 1.6,
-    speed: 1.35,
-    regen: 1.75
+    speed: 1.3,
+    regen: 1.58
 }
 const maxUpgrades = {
     hp: 8,
+    strength: 6,
     bodyDamage: 6,
     speed: 5,
     regen: 9
@@ -370,6 +376,7 @@ function drawStats(ctx) {
 
     const stats = [
         { name: "HP", value: player.maxHp.toFixed(1), key: "hp" },
+        { name: "Strength", value: player.strength.toFixed(1), key: "strength" },
         { name: "Body Damage", value: player.bodyDamage.toFixed(1), key: "bodyDamage" },
         { name: "Speed", value: player.speed.toFixed(1), key: "speed" },
         { name: "Regen", value: (player.regenRate * 1000).toFixed(3) + "/s", key: "regen" }
@@ -539,7 +546,6 @@ function spawnFirePatch() {
     if (firePatches.length >= FIRE_CAP) return;
     const rarityPicked = pickRarityByWeight(player.level);
 
-
     let tries = 0;
     while (tries < 50) { // avoid infinite loop if map is crowded
         const x = Math.random() * (mapWidth - 100) + 50;
@@ -569,7 +575,7 @@ function spawnFirePatch() {
         let tooCloseToFire = false;
         for (const fire of firePatches) {
             const distToFire = Math.hypot(x - fire.x, y - fire.y);
-            if (distToFire < fire.radius * 2) {
+            if (distToFire < fire.radius * 3) {
                 tooCloseToFire = true;
             }
         }
@@ -736,7 +742,7 @@ document.addEventListener("click", (e) => {
             mouseX >= btn.x && mouseX <= btn.x + btn.w &&
             mouseY >= btn.y && mouseY <= btn.y + btn.h
         ) {
-            if (player.skillPoints >= btn.cost && player.upgrades[stat] < 8) {
+            if (player.skillPoints >= btn.cost && player.upgrades[stat] < 9) {
                 player.skillPoints -= btn.cost;
                 player.upgrades[stat]++;
 
@@ -756,6 +762,8 @@ document.addEventListener("click", (e) => {
                     case "regen":
                         player.regenRate *= upgradeMultipliers.regen;
                         break;
+                    case "strength":
+                        player.strength += statGains.strength * Math.pow(upgradeMultipliers.strength, player.upgrades[stat] - 1);
                 }
             }
         }
