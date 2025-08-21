@@ -11,13 +11,15 @@ class Player {
         this.hpPerc = this.hp / this.maxHp;
         this.level = 1;
         this.xp = 0;
-        this.xpNeeded = 10;
+        this.xpNeeded = 5;
         this.bodyDamage = 1;
+        this.strength = 2;
         this.regenUnlocked = false;
-        this.regenRate = 0; // 0.5 hp per second
-        this.XP_GROWTH_RATE = 1.1;
-        this.HP_GROWTH_RATE = 1.04;
+        this.regenRate = 0;
+        this.XP_GROWTH_RATE = 1.05;
+        this.HP_GROWTH_RATE = 1.03;
         this.BODY_DAMAGE_GROWTH_RATE = 1.02;
+        this.STRENGTH_GROWTH_RATE = 1.025;
         this.skillPoints = 0;
 
         // Sword animation and stats
@@ -27,7 +29,9 @@ class Player {
         this.swingAngleOffset = 0;
         this.swingCooldown = 500;
         this.lastSwingTime = 0;
-        this.damage = 5;
+        this.swordDamage = 3;
+
+        this.damage = this.strength + this.swordDamage;
 
         // Shield animation
         this.isBlocking = false;
@@ -58,10 +62,13 @@ class Player {
             // Calculate current HP percentage before increasing maxHp
             const currentHpPerc = this.hp / this.maxHp;
             this.xpNeeded *= this.XP_GROWTH_RATE;
-            this.maxHp += 1 * Math.pow(this.HP_GROWTH_RATE, this.level - 1);
-            this.bodyDamage += 0.1 * Math.pow(this.BODY_DAMAGE_GROWTH_RATE, this.level - 1);
-            this.damage += 0.15 * Math.pow(this.BODY_DAMAGE_GROWTH_RATE, this.level - 1);
-            this.hp = this.maxHp * currentHpPerc;
+            if (this.level <= 100) {
+                this.maxHp += 1 * Math.pow(this.HP_GROWTH_RATE, this.level - 1);
+                this.bodyDamage += 0.1 * Math.pow(this.BODY_DAMAGE_GROWTH_RATE, this.level - 1);
+                this.strength += 0.1 * Math.pow(this.STRENGTH_GROWTH_RATE, this.level - 1);
+                this.hp = this.maxHp * currentHpPerc;
+            }
+
             // console.log(`Player level: ${this.level}`);
             // console.log(`XP needed: ${this.xpNeeded}`);
             // console.log(`Player HP: ${this.maxHp}`);
@@ -71,7 +78,7 @@ class Player {
 
         if (this.level === 2) {
             this.regenUnlocked = true;
-            this.regenRate = 0.000416;
+            this.regenRate = 0.0005;
         }
     }
 
@@ -135,6 +142,8 @@ class Player {
         // clamp camera so it doesn't scroll past the map
         camera.x = Math.max(0, Math.min(camera.x, mapWidth - canvas.width));
         camera.y = Math.max(0, Math.min(camera.y, mapHeight - canvas.height));
+
+        this.damage = this.strength + this.swordDamage;
 
         // sword animation
         if (this.isSwinging) {
