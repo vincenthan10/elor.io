@@ -37,14 +37,14 @@ let fireShards = [];
 let inventoryOpen = false;
 const inventoryButton = {
     x: 20,
-    y: canvas.height - 50,
+    y: canvas.height - 130,
     width: 100,
     height: 30
 }
-const invX = 150;
-const invY = canvas.height - 150;
-const invW = 200;
-const invH = 120;
+const invX = 140;
+const invY = canvas.height - 200;
+const invW = 210;
+const invH = 180;
 
 let statsOpen = false;
 const statsButton = {
@@ -57,6 +57,19 @@ const stX = 130;
 const stY = canvas.height - 220;
 const stW = 280;
 const stH = 200;
+
+let craftOpen = false;
+const craftButton = {
+    x: 20,
+    y: canvas.height - 50,
+    width: 100,
+    height: 30
+}
+const crX = 140;
+const crY = canvas.height - 200;
+const crW = 250;
+const crH = 180;
+
 player.upgrades = {
     hp: 0,
     strength: 0,
@@ -99,6 +112,17 @@ const maxUpgrades = {
     speed: 5,
     regen: 9
 }
+
+const recipes = {
+    fireSword: {
+        name: "Fire Sword",
+        icon: "fireSword",
+        output: { item: "fireSword", amount: 1 },
+        cost: [
+            { item: "fireShard", amount: 10 }
+        ]
+    }
+};
 
 let gameState = "title";
 // username text cursor
@@ -290,6 +314,18 @@ function draw() {
         drawStats(ctx);
     }
 
+    // Craft button
+    ctx.fillStyle = "#444";
+    ctx.fillRect(craftButton.x, craftButton.y, craftButton.width, craftButton.height);
+    ctx.strokeRect(craftButton.x, craftButton.y, craftButton.width, craftButton.height);
+    ctx.fillStyle = "white";
+    ctx.font = "16px Arial";
+    ctx.fillText("Crafting", craftButton.x + 19, craftButton.y + 20);
+
+    if (craftOpen) {
+        drawCrafting(ctx);
+    }
+
     // HP bar
     ctx.fillStyle = "red";
     ctx.fillRect(10, 10, 125, 25);
@@ -347,14 +383,15 @@ function drawInventory(ctx) {
     ctx.font = "18px Arial";
     ctx.fillText("Inventory", invX + 10, invY + 25);
 
+    ctx.font = "14px Arial";
     if (player.fireShards > 0) {
         const shardIcon = new FireShard(invX + 10, invY + 40);
-        shardIcon.drawIcon(ctx, invX + 15, invY + 40);
+        shardIcon.drawIcon(ctx, invX + 15, invY + 49);
         ctx.fillStyle = "white";
-        ctx.fillText(`Fire Shards x ${player.fireShards}`, invX + 35, invY + 50);
+        ctx.fillText(`Fire Shards x ${player.fireShards}`, invX + 35, invY + 52);
     } else {
         ctx.fillStyle = "white";
-        ctx.fillText("Empty", invX + 20, invY + 55);
+        ctx.fillText("Empty", invX + 20, invY + 52);
     }
 }
 
@@ -421,6 +458,29 @@ function drawStats(ctx) {
 }
 
 let statButtons = {};
+
+function drawCrafting(ctx) {
+    // Background box
+    ctx.fillStyle = "#222";
+    ctx.fillRect(crX, crY, crW, crH);
+    ctx.strokeStyle = "white";
+    ctx.strokeRect(crX, crY, crW, crH);
+    ctx.fillStyle = "white";
+    ctx.font = "18px Arial";
+    ctx.fillText("Crafting", crX + 15, crY + 25);
+
+    let y = 55;
+    for (let key in recipes) {
+        const recipe = recipes[key];
+        if (!canSeeRecipe(recipe)) continue;
+
+
+    }
+}
+
+function canSeeRecipe(recipe) {
+    return recipe.cost.some(req => player.inventory[req.item] >= 1);
+}
 
 // Calculate cost based on current level
 function getUpgradeCost(stat) {
@@ -630,15 +690,18 @@ document.addEventListener("keydown", (e) => {
     if (e.key == "q") player.mouseMovement = !player.mouseMovement;
     if (e.key == "z") {
         inventoryOpen = !inventoryOpen;
-        if (inventoryOpen) {
-            statsOpen = false;
-        }
+        statsOpen = false;
+        craftOpen = false;
     }
     if (e.key == "x") {
         statsOpen = !statsOpen;
-        if (statsOpen) {
-            inventoryOpen = false;
-        }
+        inventoryOpen = false;
+        craftOpen = false;
+    }
+    if (e.key == "c") {
+        craftOpen = !craftOpen;
+        inventoryOpen = false;
+        statsOpen = false;
     }
     if (e.code == "Space") mouseLeft = true;
     if (e.code == "ShiftLeft" || e.code == "ShiftRight") mouseRight = true;
