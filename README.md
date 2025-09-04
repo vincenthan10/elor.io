@@ -1,0 +1,4 @@
+This is a slowly working in progress project on a 2D browser game, elor.io, inspired by florr.io. This is my first time using JavaScript and I have used AI and other online resources as tools to help me learn the language. Currently, the structure of my code needs a huge revamp so that it will be much easier to add other entities to the game.
+
+You are a warrior. You can use arrow keys, or WASD, or your mouse to move, using Q to toggle between keyboard and mouse movement. The objective of the game is explore the (currently small) world of elor and destroy as many monsters/mobs (haven't fully decided on the general name for the enemies yet), collect their loot, and use them to craft stronger equipment and learn various magic spells. 
+The eventual plan is for players' progress to be saved just like in florr.io and add multiplayer. But for now, I am still working on the core mechanics of the game.
