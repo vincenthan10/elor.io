@@ -11,6 +11,7 @@ const playerSpawnY = 300;
 let mouseLeft = false;
 let mouseRight = false;
 
+// array
 const rarityTable = [
     { key: "Common", weight: 50, sizeMult: 1.0, hpMult: 1.0, dmgMult: 1.0, xpMult: 1.0, drops: 1, color: "#4fbe53ff" },
     { key: "Unusual", weight: 25, sizeMult: 1.2, hpMult: 1.8, dmgMult: 1.6, xpMult: 2.0, drops: 1, color: "#f1de37ff" }, // 2.1, 1.9
@@ -70,6 +71,7 @@ const crY = canvas.height - 200;
 const crW = 250;
 const crH = 180;
 
+// object literal
 player.upgrades = {
     hp: 0,
     strength: 0,
@@ -113,6 +115,7 @@ const maxUpgrades = {
     regen: 9
 }
 
+// dictionary, CHANGE TO ARRAY
 const recipes = {
     fireSword: {
         name: "Fire Sword",
@@ -165,10 +168,10 @@ function update(deltaTime) {
     }
     player.update(deltaTime, keysPressed, camera, mapWidth, mapHeight, isCollidingWithWall);
     if (mouseLeft) {
-        startSwordSwing();
+        player.attack();
     }
     if (mouseRight) {
-        startShieldBlock();
+        player.defend();
     }
     firePatches.forEach(f => f.update(deltaTime));
     checkSwordHits();
@@ -504,24 +507,7 @@ function isCollidingWithWall(x, y) {
     return false;
 }
 
-function startSwordSwing() {
-    // current time
-    const now = performance.now();
-    if (!player.isSwinging && now - player.lastSwingTime >= player.swingCooldown) {
-        player.isSwinging = true;
-        player.swingTimer = 0;
-        player.lastSwingTime = now;
-    }
-}
 
-function startShieldBlock() {
-    const now = performance.now();
-    if (!player.isBlocking && now - player.lastBlockTime >= player.blockCooldown) {
-        player.isBlocking = true;
-        player.blockTimer = 0;
-        player.lastBlockTime = now;
-    }
-}
 
 function checkSwordHits() {
     if (!player.isSwinging) return;
