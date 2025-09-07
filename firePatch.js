@@ -1,8 +1,6 @@
-class FirePatch {
+class FirePatch extends Enemy {
 
     constructor(x, y, rarityKey = null) {
-        this.x = x;
-        this.y = y;
 
         const rarity = rarityKey ? rarityTable.find(r => r.key === rarityKey) : pickRarityByWeight();
         this.rarity = rarity;
@@ -11,37 +9,13 @@ class FirePatch {
         const baseRadius = 20;
         const baseHp = 14;
         const baseDamage = 4;
-        const baseXp = 5;
+        const baseXp = 3;
 
-        this.radius = Math.round(baseRadius * rarity.sizeMult);
-        this.isAlive = true;
-        this.isFading = false;
-        this.fadeAlpha = 1; // for fade-out animation
-        this.maxHp = Math.max(1, Math.round(baseHp * rarity.hpMult));
-        this.hp = this.maxHp;
-        this.xp = Math.max(1, Math.round(baseXp * rarity.xpMult));
-        this.damage = Math.max(1, Math.round(baseDamage * rarity.dmgMult));
-        this.damageDelay = 500;
-
-        this.hitCooldown = 0; // sword delay
-        this.bodyHitCooldown = 0; // body collision delay
-        this.lastDamageTime = 0; // for body collision delay
+        super(x, y, baseRadius, baseHp, 0, baseDamage, baseXp, rarityKey);
     }
 
     update(deltaTime) {
-        if (this.isFading) {
-            this.fadeAlpha -= deltaTime / 300; // fade speed
-            if (this.fadeAlpha <= 0) {
-                this.isAlive = false;
-            }
-        }
-
-        if (this.hitCooldown > 0) {
-            this.hitCooldown -= deltaTime;
-        }
-        if (this.bodyHitCooldown > 0) {
-            this.bodyHitCooldown -= deltaTime;
-        }
+        super(deltaTime);
     }
 
     draw(ctx, camera) {
@@ -74,23 +48,5 @@ class FirePatch {
         ctx.fillText(this.rarity.key, this.x - camera.x - this.radius + this.radius * 1.4 + 6, this.y - camera.y + this.radius * 1.25 + this.radius / 5 / 2);
 
 
-    }
-
-    hit(damage, sword, body) {
-        if (this.isFading) return;
-        if (sword) {
-            if (this.hitCooldown > 0) return;
-            this.hitCooldown = 250;
-        }
-        if (body) {
-            if (this.bodyHitCooldown > 0) return;
-            this.bodyHitCooldown = 500;
-        }
-        this.hp -= damage;
-
-        if (this.hp <= 0) {
-            this.hp = 0;
-            this.isFading = true;
-        }
     }
 }
