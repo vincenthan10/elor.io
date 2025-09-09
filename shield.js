@@ -1,4 +1,4 @@
-class Shield {
+class Shield extends Collectible {
     constructor(equipped = true, blockDuration = 750, blockCooldown = 1500, width = 22, height = 25, tipHeight = 10) {
         this.equipped = equipped;
         this.blockDuration = blockDuration;
@@ -63,5 +63,21 @@ class Shield {
         ctx.closePath();
         ctx.fill();
         ctx.restore();
+    }
+
+    drawIcon(ctx, x, y, scale = 1) {
+        ctx.save();
+        ctx.translate(x, y);
+        ctx.scale(scale, scale);
+
+        ctx.fillStyle = "#88ffff";
+        ctx.beginPath();
+        ctx.moveTo(-5, -5);
+        ctx.lineTo(5, -5);
+        ctx.lineTo(5, 3);
+        ctx.lineTo(0, 5);
+        ctx.lineTo(-5, 3);
+        ctx.closePath();
+        ctx.fill();
     }
 }
