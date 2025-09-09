@@ -1,4 +1,4 @@
-class Sword {
+class Sword extends Collectible {
     constructor(equipped = true, damage = 3, duration = 250, cooldown = 500, length = 30, width = 12) {
         this.equipped = equipped;
         this.damage = damage;
@@ -12,7 +12,7 @@ class Sword {
         this.swingAngleOffset = 0;
     }
 
-    swing(deltaTime, player) {
+    swing(deltaTime) {
         // sword animation
         if (this.isSwinging) {
             this.swingTimer += deltaTime;
@@ -26,8 +26,9 @@ class Sword {
                 this.isSwinging = false;
                 this.swingAngleOffset = 0;
             }
+
         }
-        // TODO: ADD COLLISION CHECK WITH ALL ENEMIES 
+        // ADD COLLISION CHECK WITH ALL ENEMIES? OR LEAVE IT IN MAIN? 
     }
 
     draw(ctx, camera, player) {
@@ -63,6 +64,20 @@ class Sword {
         ctx.moveTo(tipX - camera.x, tipY - camera.y);
         ctx.lineTo(base1X - camera.x, base1Y - camera.y);
         ctx.lineTo(base2X - camera.x, base2Y - camera.y);
+        ctx.closePath();
+        ctx.fill();
+    }
+
+    drawIcon(ctx, x, y, scale = 1) {
+        ctx.save();
+        ctx.translate(x, y);
+        ctx.scale(scale, scale);
+
+        ctx.fillStyle = "silver";
+        ctx.beginPath();
+        ctx.moveTo(-4, -4);
+        ctx.lineTo(0, 4);
+        ctx.lineTo(4, -4);
         ctx.closePath();
         ctx.fill();
     }
