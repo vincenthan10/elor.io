@@ -1,12 +1,8 @@
 class FireShard {
-    constructor(x, y) {
-        this.x = x;
-        this.y = y;
+    constructor(x, y, amount = 1, interactable = true) {
+        super(x, y, amount, interactable);
         this.width = 16;
         this.height = 20;
-        this.isCollected = false;
-        this.isAlive = true;
-        this.lifetime = 0;
         // Store consistent irregular corners
         this.cornerOffsets = [
             { x: Math.random() * 4, y: Math.random() * 4 },
@@ -14,14 +10,6 @@ class FireShard {
             { x: Math.random() * 4, y: Math.random() * 4 },
             { x: Math.random() * 4, y: Math.random() * 4 }
         ];
-    }
-
-    update(deltaTime) {
-        this.lifetime += deltaTime;
-
-        if (this.lifetime >= 15000) {
-            this.isAlive = false; // despawn after 15 seconds
-        }
     }
 
     draw(ctx, camera, time) {
