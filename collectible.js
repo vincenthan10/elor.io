@@ -1,5 +1,5 @@
 class Collectible {
-    constructor(x, y, amount = 1, interactable = true) {
+    constructor(x, y, amount = 1, interactable = true, key = "generic") {
         this.x = x;
         this.y = y;
         this.interactable = interactable;
@@ -8,11 +8,12 @@ class Collectible {
         this.isAlive = true;
         this.lifetime = 0;
         this.despawnTime = 10000;
+        this.key = key;
     }
 
     collect(player) {
-        if (this.isAlive) {
-            player.inventory.fireShards = (player.inventory.fireShards || 0) + this.amount;
+        if (this.isAlive && this.interactable) {
+            player.inventory[this.key] = (player.inventory[this.key] || 0) + this.amount;
             this.isCollected = true;
             this.isAlive = false;
         }
@@ -30,7 +31,7 @@ class Collectible {
 
     }
 
-    drawIcon(ctx, x, y, scale = 1) {
+    static drawIcon(ctx, x, y, scale = 1) {
 
     }
 }
