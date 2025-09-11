@@ -1,5 +1,6 @@
 class Shield extends Collectible {
-    constructor(equipped = true, blockDuration = 750, blockCooldown = 1500, width = 22, height = 25, tipHeight = 10) {
+    constructor(equipped = true, blockDuration = 750, blockCooldown = 1500, width = 22, height = 25, tipHeight = 10, key = "Basic Shield") {
+        super(0, 0, 1, false, key);
         this.equipped = equipped;
         this.blockDuration = blockDuration;
         this.blockCooldown = blockCooldown;
@@ -26,11 +27,11 @@ class Shield extends Collectible {
         const angle = player.aimAngle;
 
         const shieldLocalPoints = [
-            { x: height + tipHeight, y: 0 },   // tip (right side)
-            { x: height, y: -halfW },                // top right
+            { x: this.height + this.tipHeight, y: 0 },   // tip (right side)
+            { x: this.height, y: -halfW },                // top right
             { x: 0, y: -halfW },                            // top left
             { x: 0, y: halfW },                             // bottom left
-            { x: height, y: halfW }                  // bottom right
+            { x: this.height, y: halfW }                  // bottom right
         ];
 
         const isBlocking = this.isBlocking;
@@ -65,7 +66,7 @@ class Shield extends Collectible {
         ctx.restore();
     }
 
-    drawIcon(ctx, x, y, scale = 1) {
+    static drawIcon(ctx, x, y, scale = 1) {
         ctx.save();
         ctx.translate(x, y);
         ctx.scale(scale, scale);
