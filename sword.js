@@ -1,5 +1,6 @@
 class Sword extends Collectible {
-    constructor(equipped = true, damage = 3, duration = 250, cooldown = 500, length = 30, width = 12) {
+    constructor(equipped = true, damage = 3, duration = 250, cooldown = 500, length = 30, width = 12, key = "Basic Sword") {
+        super(0, 0, 1, false, key);
         this.equipped = equipped;
         this.damage = damage;
         this.duration = duration;
@@ -40,16 +41,16 @@ class Sword extends Collectible {
         const handOffsetDistance = player.radius * 1.1;
 
         // tip of sword
-        const tipX = player.x + Math.cos(swordAngle) * (player.radius + length);
-        const tipY = player.y + Math.sin(swordAngle) * (player.radius + length);
+        const tipX = player.x + Math.cos(swordAngle) * (player.radius + this.length);
+        const tipY = player.y + Math.sin(swordAngle) * (player.radius + this.length);
 
         // base of the sword
         const baseX = player.x + Math.cos(handOffsetAngle) * handOffsetDistance;
         const baseY = player.y + Math.sin(handOffsetAngle) * handOffsetDistance;
 
         // perpendicular offsets for triangle width
-        const offsetX = Math.cos(swordAngle + Math.PI / 2) * (width / 2);
-        const offsetY = Math.sin(swordAngle + Math.PI / 2) * (width / 2);
+        const offsetX = Math.cos(swordAngle + Math.PI / 2) * (this.width / 2);
+        const offsetY = Math.sin(swordAngle + Math.PI / 2) * (this.width / 2);
 
         // base corners
         const base1X = baseX + offsetX;
@@ -68,7 +69,7 @@ class Sword extends Collectible {
         ctx.fill();
     }
 
-    drawIcon(ctx, x, y, scale = 1) {
+    static drawIcon(ctx, x, y, scale = 1) {
         ctx.save();
         ctx.translate(x, y);
         ctx.scale(scale, scale);
