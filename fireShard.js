@@ -1,6 +1,6 @@
 class FireShard {
     constructor(x, y, amount = 1, interactable = true) {
-        super(x, y, amount, interactable);
+        super(x, y, amount, interactable, "Fire Shard");
         this.width = 16;
         this.height = 20;
         // Store consistent irregular corners
@@ -47,7 +47,7 @@ class FireShard {
         ctx.restore();
     }
 
-    drawIcon(ctx, x, y, scale = 1) {
+    static drawIcon(ctx, x, y, scale = 1) {
         ctx.save();
         ctx.translate(x, y);
         ctx.scale(scale, scale);
