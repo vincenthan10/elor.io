@@ -4,15 +4,7 @@ class Inventory extends Menu {
         this.player = player;
     }
 
-    updateOptions() {
-        this.options = Object.keys(this.player.inventory).map(key => ({
-            label: `${key}: ${this.player.inventory[key]}`,
-            action: () => { }
-        }));
-    }
-
     open() {
-        this.updateOptions();
         super.open();
     }
 
