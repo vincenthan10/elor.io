@@ -2,17 +2,22 @@ class Inventory extends Menu {
     constructor(player) {
         super([]);
         this.player = player;
+
+        const invX = 140;
+        const invY = canvas.height - 200;
+        const invW = 210;
+        const invH = 180;
     }
 
     open() {
         super.open();
     }
 
+    close() {
+        super.close();
+    }
+
     draw(ctx) {
-        const invX = 140;
-        const invY = canvas.height - 200;
-        const invW = 210;
-        const invH = 180;
 
         // Background box
         ctx.fillStyle = "#222";
