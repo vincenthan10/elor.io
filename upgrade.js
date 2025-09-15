@@ -2,6 +2,10 @@ class Upgrade extends Menu {
     constructor(player) {
         super([]);
         this.player = player;
+        const stX = 130;
+        const stY = canvas.height - 220;
+        const stW = 280;
+        const stH = 200;
         this.upgrades = {
             hp: 0,
             strength: 0,
@@ -51,16 +55,16 @@ class Upgrade extends Menu {
         super.open();
     }
 
+    close() {
+        super.close();
+    }
+
     // Calculate cost based on current level
     getUpgradeCost(stat) {
         return this.upgradeCosts[stat] + this.costIncreases[stat] * this.upgrades[stat];
     }
 
     draw(ctx) {
-        const stX = 130;
-        const stY = canvas.height - 220;
-        const stW = 280;
-        const stH = 200;
 
         // Background
         ctx.fillStyle = "rgba(0, 0, 0, 0.8)";
