@@ -27,6 +27,9 @@ class Player extends Entity {
         this.dx = 0;
         this.dy = 0;
         this.mouseMovement = false;
+
+        // Inventory
+        this.inventory = {};
     }
 
     addXP(amount) {
@@ -89,7 +92,7 @@ class Player extends Entity {
         }
     }
 
-    update(deltaTime, keysPressed, camera, mapWidth, mapHeight, isCollidingWithWall) {
+    update(deltaTime, keysPressed, camera, mapWidth, mapHeight, walls) {
         // Movement and boundaries
         //keyboard movement
         let dx = 0;
@@ -125,14 +128,14 @@ class Player extends Entity {
         if (!this.mouseMovement) {
             let newX = this.x + dx;
             let newY = this.y + dy;
-            if (!isCollidingWithWall(newX, this.y)) this.x = newX;
-            if (!isCollidingWithWall(this.x, newY)) this.y = newY;
+            if (!isCollidingWithWall(newX, this.y, walls)) this.x = newX;
+            if (!isCollidingWithWall(this.x, newY, walls)) this.y = newY;
         } else {
             // mouse movement
             let newX = this.x + this.dx;
             let newY = this.y + this.dy;
-            if (!isCollidingWithWall(newX, this.y)) this.x = newX;
-            if (!isCollidingWithWall(this.x, newY)) this.y = newY;
+            if (!isCollidingWithWall(newX, this.y, walls)) this.x = newX;
+            if (!isCollidingWithWall(this.x, newY, walls)) this.y = newY;
         }
 
         camera.x = this.x - canvas.width / 2;
@@ -142,7 +145,7 @@ class Player extends Entity {
         camera.x = Math.max(0, Math.min(camera.x, mapWidth - canvas.width));
         camera.y = Math.max(0, Math.min(camera.y, mapHeight - canvas.height));
 
-        this.sword.swing(deltaTime, this);
+        this.sword.swing(deltaTime);
         this.shield.block(deltaTime);
         this.damage = this.strength + this.swordDamage;
 
@@ -150,6 +153,24 @@ class Player extends Entity {
         this.passiveRegen(deltaTime);
 
     }
+
+    isCollidingWithWall(x, y, walls) {
+        for (const wall of walls) {
+            // Find closest point on rectangle to the circle
+            const closestX = Math.max(wall.x, Math.min(x, wall.x + wall.width));
+            const closestY = Math.max(wall.y, Math.min(y, wall.y + wall.height));
+
+            // Find distance between circle center and that point
+            const dx = x - closestX;
+            const dy = y - closestY;
+
+            if (dx * dx + dy * dy < player.radius * player.radius) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 
     draw(ctx, camera) {
         if (this.hp <= 0) return;
@@ -166,5 +187,8 @@ class Player extends Entity {
 
         ctx.fillStyle = "limegreen";
         ctx.fillRect(this.x - camera.x - this.radius, this.y - camera.y + this.radius * 1.25, (this.hp / this.maxHp) * (this.radius * 2), this.radius / 5);
+
+        this.sword.draw(ctx, camera, this);
+        this.shield.draw(ctx, camera, this);
     }
 }
