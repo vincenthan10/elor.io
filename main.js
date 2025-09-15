@@ -11,7 +11,7 @@ const playerSpawnY = 300;
 let mouseLeft = false;
 let mouseRight = false;
 
-// array
+// array - this is for enemy stat changes for different rarities
 const rarityTable = [
     { key: "Common", weight: 50, sizeMult: 1.0, hpMult: 1.0, dmgMult: 1.0, xpMult: 1.0, drops: 1, color: "#4fbe53ff" },
     { key: "Unusual", weight: 25, sizeMult: 1.2, hpMult: 1.8, dmgMult: 1.6, xpMult: 2.0, drops: 1, color: "#f1de37ff" }, // 2.1, 1.9
@@ -23,109 +23,113 @@ const rarityTable = [
     { key: "Supreme", weight: 0.3, sizeMult: 10, hpMult: 1200, dmgMult: 60, xpMult: 1583, drops: 50, color: "#666666" } // 3000, 125
 ]
 
-const firePatches = [
+const enemies = [
     new FirePatch(600, 400),
     new FirePatch(900, 700)
 ];
+// these 5 lines: maybe will be put into their respective enemy classes?
 const FIRE_CAP = 50;
 const MIN_SPAWN_INTERVAL = 1500; // 2 seconds
 const MAX_SPAWN_INTERVAL = 5000; // 6 seconds
 let lastFireSpawnTime = 0;
 let fireSpawnInterval = 3000;
 
+// ???
 let fireShards = [];
 
-let inventoryOpen = false;
+// let inventoryOpen = false;
 const inventoryButton = {
     x: 20,
     y: canvas.height - 130,
     width: 100,
     height: 30
 }
-const invX = 140;
-const invY = canvas.height - 200;
-const invW = 210;
-const invH = 180;
+const inv = new Inventory(this.player);
+// const invX = 140;
+// const invY = canvas.height - 200;
+// const invW = 210;
+// const invH = 180;
 
-let statsOpen = false;
+// let statsOpen = false;
 const statsButton = {
     x: 20,
     y: canvas.height - 90,
     width: 100,
     height: 30
 }
-const stX = 130;
-const stY = canvas.height - 220;
-const stW = 280;
-const stH = 200;
+const stats = new Upgrade(this.player);
+// const stX = 130;
+// const stY = canvas.height - 220;
+// const stW = 280;
+// const stH = 200;
 
-let craftOpen = false;
+// let craftOpen = false;
 const craftButton = {
     x: 20,
     y: canvas.height - 50,
     width: 100,
     height: 30
 }
-const crX = 140;
-const crY = canvas.height - 200;
-const crW = 250;
-const crH = 180;
+// const crX = 140;
+// const crY = canvas.height - 200;
+// const crW = 250;
+// const crH = 180;
 
 // object literal
-player.upgrades = {
-    hp: 0,
-    strength: 0,
-    bodyDamage: 0,
-    speed: 0,
-    regen: 0
-}
-const baseUpgradeCosts = {
-    hp: 1,
-    strength: 2,
-    bodyDamage: 2,
-    speed: 1,
-    regen: 2
-}
-const costIncreases = {
-    hp: 1,
-    strength: 2,
-    bodyDamage: 1,
-    speed: 2,
-    regen: 2
-}
-const statGains = {
-    hp: 4,
-    strength: 0.8,
-    bodyDamage: 0.5,
-    speed: 0.2,
-    regen: 0.4
-}
-const upgradeMultipliers = {
-    hp: 1.3,
-    strength: 1.35,
-    bodyDamage: 1.6,
-    speed: 1.3,
-    regen: 1.58
-}
-const maxUpgrades = {
-    hp: 8,
-    strength: 6,
-    bodyDamage: 6,
-    speed: 5,
-    regen: 9
-}
+// player.upgrades = {
+//     hp: 0,
+//     strength: 0,
+//     bodyDamage: 0,
+//     speed: 0,
+//     regen: 0
+// }
+// const baseUpgradeCosts = {
+//     hp: 1,
+//     strength: 2,
+//     bodyDamage: 2,
+//     speed: 1,
+//     regen: 2
+// }
+// const costIncreases = {
+//     hp: 1,
+//     strength: 2,
+//     bodyDamage: 1,
+//     speed: 2,
+//     regen: 2
+// }
+// const statGains = {
+//     hp: 4,
+//     strength: 0.8,
+//     bodyDamage: 0.5,
+//     speed: 0.2,
+//     regen: 0.4
+// }
+// const upgradeMultipliers = {
+//     hp: 1.3,
+//     strength: 1.35,
+//     bodyDamage: 1.6,
+//     speed: 1.3,
+//     regen: 1.58
+// }
+// const maxUpgrades = {
+//     hp: 8,
+//     strength: 6,
+//     bodyDamage: 6,
+//     speed: 5,
+//     regen: 9
+// }
 
 // dictionary, CHANGE TO ARRAY
-const recipes = {
-    fireSword: {
-        name: "Fire Sword",
-        icon: "fireSword",
-        output: { item: "fireSword", amount: 1 },
-        cost: [
-            { item: "fireShard", amount: 10 }
-        ]
-    }
-};
+// const recipes = {
+//     fireSword: {
+//         name: "Fire Sword",
+//         icon: "fireSword",
+//         output: { item: "fireSword", amount: 1 },
+//         cost: [
+//             { item: "fireShard", amount: 10 }
+//         ]
+//     }
+// };
 
 let gameState = "title";
 // username text cursor
@@ -166,52 +170,53 @@ function update(deltaTime) {
         updateCursor(deltaTime);
         return;
     }
-    player.update(deltaTime, keysPressed, camera, mapWidth, mapHeight, isCollidingWithWall);
+    player.update(deltaTime, keysPressed, camera, mapWidth, mapHeight, walls);
     if (mouseLeft) {
         player.attack();
     }
     if (mouseRight) {
         player.defend();
     }
-    firePatches.forEach(f => f.update(deltaTime));
+    enemies.forEach(e => e.update(deltaTime));
     checkSwordHits();
-    // Remove dead fires
-    for (let i = firePatches.length - 1; i >= 0; i--) {
-        if (!firePatches[i].isAlive) {
-            firePatches.splice(i, 1);
+    // Remove dead enemies
+    for (let i = enemies.length - 1; i >= 0; i--) {
+        if (!enemies[i].isAlive) {
+            enemies.splice(i, 1);
         }
     }
 
-    // Player-fire collision
-    firePatches.forEach(fire => {
-        if (fire.isAlive && !fire.isFading) {
-            const dx = player.x - fire.x;
-            const dy = player.y - fire.y;
+    // Player-enemy collision
+    enemies.forEach(enemy => {
+        if (enemy.isAlive && !enemy.damageable.isFading) {
+            const dx = player.x - enemy.x;
+            const dy = player.y - enemy.y;
             const dist = Math.sqrt(dx * dx + dy * dy);
-            if (dist < player.radius + fire.radius) {
+            if (dist < player.radius + enemy.radius) {
                 const now = performance.now();
-                if (now - fire.lastDamageTime >= fire.damageDelay) {
-                    if (!player.isBlocking) {
-                        takeDamage(fire.damage);
-                    }
-                    fire.hit(player.bodyDamage, false, true);
-                    fire.lastDamageTime = now;
-                    if (fire.isFading) {
-                        for (let i = 0; i < fire.rarity.drops; i++) {
-                            const offsetX = (Math.random() - 0.5) * 20;
-                            const offsetY = (Math.random() - 0.5) * 20;
-                            fireShards.push(new FireShard(fire.x + offsetX, fire.y + offsetY));
-                            player.addXP(10);
-                        }
-                        player.addXP(fire.xp);
-                    }
+
+                if (!player.shield.isBlocking) {
+                    takeDamage(fire.damage);
                 }
+                enemy.takeDamage(player.bodyDamage, false, true);
+                //enemy.lastDamageTime = now;
+                // maybe change later to give enemies their own drops
+                if (enemy.isFading) {
+                    for (let i = 0; i < enemy.rarity.drops; i++) {
+                        const offsetX = (Math.random() - 0.5) * 20;
+                        const offsetY = (Math.random() - 0.5) * 20;
+                        fireShards.push(new FireShard(enemy.x + offsetX, enemy.y + offsetY));
+                        player.addXP(10);
+                    }
+                    player.addXP(enemy.xp);
+                }
+
             }
         }
     })
 
     // Dynamic spawn timing
-    const aliveCount = firePatches.length;
+    const aliveCount = enemies.length;
     const now = performance.now();
     const difficultyFactor = aliveCount / FIRE_CAP;
     fireSpawnInterval = MIN_SPAWN_INTERVAL + difficultyFactor * (MAX_SPAWN_INTERVAL - MIN_SPAWN_INTERVAL);
@@ -233,7 +238,7 @@ function update(deltaTime) {
             if (dist < player.radius + shardRadius) {
                 shard.isCollected = true;
                 // increase inventory count
-                player.fireShards += 1;
+                player.inventory.push(new FireShard(-500, -500, 1, false));
             }
         }
     })
@@ -289,7 +294,7 @@ function draw() {
         ctx.fillRect(wall.x - camera.x, wall.y - camera.y, wall.width, wall.height);
     }
     player.draw(ctx, camera);
-    firePatches.forEach(f => f.draw(ctx, camera));
+    enemies.forEach(e => e.draw(ctx, camera));
     fireShards.forEach(shard => shard.draw(ctx, camera, performance.now()));
 
     // Inventory button
@@ -301,8 +306,8 @@ function draw() {
     ctx.font = "16px Arial";
     ctx.fillText("Inventory", inventoryButton.x + 15, inventoryButton.y + 20);
 
-    if (inventoryOpen) {
-        drawInventory(ctx);
+    if (inv.isOpen) {
+        inv.draw(ctx);
     }
 
     // Stats button
@@ -313,8 +318,8 @@ function draw() {
     ctx.font = "16px Arial";
     ctx.fillText("Upgrade", statsButton.x + 17, statsButton.y + 20);
 
-    if (statsOpen) {
-        drawStats(ctx);
+    if (stats.isOpen) {
+        stats.draw(ctx);
     }
 
     // Craft button
@@ -325,9 +330,9 @@ function draw() {
     ctx.font = "16px Arial";
     ctx.fillText("Crafting", craftButton.x + 19, craftButton.y + 20);
 
-    if (craftOpen) {
-        drawCrafting(ctx);
-    }
+    // if (craftOpen) {
+    //     drawCrafting(ctx);
+    // }
 
     // HP bar
     ctx.fillStyle = "red";
@@ -376,155 +381,155 @@ function draw() {
 
 }
 
-function drawInventory(ctx) {
-    // Background box
-    ctx.fillStyle = "#222";
-    ctx.fillRect(invX, invY, invW, invH);
-    ctx.strokeStyle = "white";
-    ctx.strokeRect(invX, invY, invW, invH);
-    ctx.fillStyle = "white";
-    ctx.font = "18px Arial";
-    ctx.fillText("Inventory", invX + 10, invY + 25);
+// function drawInventory(ctx) {
+//     // Background box
+//     ctx.fillStyle = "#222";
+//     ctx.fillRect(invX, invY, invW, invH);
+//     ctx.strokeStyle = "white";
+//     ctx.strokeRect(invX, invY, invW, invH);
+//     ctx.fillStyle = "white";
+//     ctx.font = "18px Arial";
+//     ctx.fillText("Inventory", invX + 10, invY + 25);
 
-    ctx.font = "14px Arial";
-    if (player.fireShards > 0) {
-        const shardIcon = new FireShard(invX + 10, invY + 40);
-        shardIcon.drawIcon(ctx, invX + 15, invY + 49);
-        ctx.fillStyle = "white";
-        ctx.fillText(`Fire Shards x ${player.fireShards}`, invX + 35, invY + 52);
-    } else {
-        ctx.fillStyle = "white";
-        ctx.fillText("Empty", invX + 20, invY + 52);
-    }
-}
+//     ctx.font = "14px Arial";
+//     if (player.fireShards > 0) {
+//         const shardIcon = new FireShard(invX + 10, invY + 40);
+//         shardIcon.drawIcon(ctx, invX + 15, invY + 49);
+//         ctx.fillStyle = "white";
+//         ctx.fillText(`Fire Shards x ${player.fireShards}`, invX + 35, invY + 52);
+//     } else {
+//         ctx.fillStyle = "white";
+//         ctx.fillText("Empty", invX + 20, invY + 52);
+//     }
+// }
 
-function drawStats(ctx) {
+// function drawStats(ctx) {
 
-    // Background
-    ctx.fillStyle = "rgba(0, 0, 0, 0.8)";
-    ctx.fillRect(stX, stY, stW, stH);
-    ctx.strokeStyle = "white";
-    ctx.strokeRect(stX, stY, stW, stH);
+//     // Background
+//     ctx.fillStyle = "rgba(0, 0, 0, 0.8)";
+//     ctx.fillRect(stX, stY, stW, stH);
+//     ctx.strokeStyle = "white";
+//     ctx.strokeRect(stX, stY, stW, stH);
 
-    ctx.fillStyle = "white";
-    ctx.font = "18px Arial";
-    ctx.fillText("Stats Menu", stX + 10, stY + 30);
+//     ctx.fillStyle = "white";
+//     ctx.font = "18px Arial";
+//     ctx.fillText("Stats Menu", stX + 10, stY + 30);
 
-    ctx.font = "14px Arial";
-    // Skill points in top right
-    ctx.fillText(`Skill Points: ${player.skillPoints}`, stX + stW - 92, stY + 25);
+//     ctx.font = "14px Arial";
+//     // Skill points in top right
+//     ctx.fillText(`Skill Points: ${player.skillPoints}`, stX + stW - 92, stY + 25);
 
-    const stats = [
-        { name: "HP", value: player.maxHp.toFixed(1), key: "hp" },
-        { name: "Strength", value: player.strength.toFixed(1), key: "strength" },
-        { name: "Body Damage", value: player.bodyDamage.toFixed(1), key: "bodyDamage" },
-        { name: "Speed", value: player.speed.toFixed(1), key: "speed" },
-        { name: "Regen", value: (player.regenRate * 1000).toFixed(3) + "/s", key: "regen" }
-    ];
-    const startY = stY + 60;
-    const lineHeight = 30;
+//     const stats = [
+//         { name: "HP", value: player.maxHp.toFixed(1), key: "hp" },
+//         { name: "Strength", value: player.strength.toFixed(1), key: "strength" },
+//         { name: "Body Damage", value: player.bodyDamage.toFixed(1), key: "bodyDamage" },
+//         { name: "Speed", value: player.speed.toFixed(1), key: "speed" },
+//         { name: "Regen", value: (player.regenRate * 1000).toFixed(3) + "/s", key: "regen" }
+//     ];
+//     const startY = stY + 60;
+//     const lineHeight = 30;
 
-    stats.forEach((stat, i) => {
-        const y = startY + i * lineHeight;
-        const cost = getUpgradeCost(stat.key);
+//     stats.forEach((stat, i) => {
+//         const y = startY + i * lineHeight;
+//         const cost = getUpgradeCost(stat.key);
 
-        ctx.fillStyle = "white";
-        ctx.fillText(`${stat.name}: ${stat.value}  (Lvl ${player.upgrades[stat.key]}/${maxUpgrades[stat.key]})`, stX + 10, y);
+//         ctx.fillStyle = "white";
+//         ctx.fillText(`${stat.name}: ${stat.value}  (Lvl ${player.upgrades[stat.key]}/${maxUpgrades[stat.key]})`, stX + 10, y);
 
-        // Draw upgrade button
-        const btnX = stX + stW - 90;
-        const btnY = y - 14;
-        const btnW = 80;
-        const btnH = 20;
+//         // Draw upgrade button
+//         const btnX = stX + stW - 90;
+//         const btnY = y - 14;
+//         const btnW = 80;
+//         const btnH = 20;
 
-        const isMax = player.upgrades[stat.key] >= maxUpgrades[stat.key];
+//         const isMax = player.upgrades[stat.key] >= maxUpgrades[stat.key];
 
-        // Button color (green if affordable and not maxed, else gray)
-        ctx.fillStyle = (!isMax && player.skillPoints >= cost) ? "green" : "gray";
-        ctx.fillRect(btnX, btnY, btnW, btnH);
-        ctx.strokeStyle = "white";
-        ctx.strokeRect(btnX, btnY, btnW, btnH);
+//         // Button color (green if affordable and not maxed, else gray)
+//         ctx.fillStyle = (!isMax && player.skillPoints >= cost) ? "green" : "gray";
+//         ctx.fillRect(btnX, btnY, btnW, btnH);
+//         ctx.strokeStyle = "white";
+//         ctx.strokeRect(btnX, btnY, btnW, btnH);
 
-        // Text
-        ctx.fillStyle = "white";
-        ctx.font = "12px Arial";
-        if (isMax) {
-            ctx.fillText("MAX", btnX + 25, btnY + 14);
-        } else {
-            ctx.fillText(`+ (${cost})`, btnX + 25, btnY + 14);
-        }
-
-
-        // Store button hitbox for clicks
-        statButtons[stat.key] = { x: btnX, y: btnY, w: btnW, h: btnH, cost: cost };
-    });
-}
-
-let statButtons = {};
-
-function drawCrafting(ctx) {
-    // Background box
-    ctx.fillStyle = "#222";
-    ctx.fillRect(crX, crY, crW, crH);
-    ctx.strokeStyle = "white";
-    ctx.strokeRect(crX, crY, crW, crH);
-    ctx.fillStyle = "white";
-    ctx.font = "18px Arial";
-    ctx.fillText("Crafting", crX + 15, crY + 25);
-
-    let y = 55;
-    for (let key in recipes) {
-        const recipe = recipes[key];
-        if (!canSeeRecipe(recipe)) continue;
+//         // Text
+//         ctx.fillStyle = "white";
+//         ctx.font = "12px Arial";
+//         if (isMax) {
+//             ctx.fillText("MAX", btnX + 25, btnY + 14);
+//         } else {
+//             ctx.fillText(`+ (${cost})`, btnX + 25, btnY + 14);
+//         }
 
 
-    }
-}
+//         // Store button hitbox for clicks
+//         statButtons[stat.key] = { x: btnX, y: btnY, w: btnW, h: btnH, cost: cost };
+//     });
+// }
 
-function canSeeRecipe(recipe) {
-    return recipe.cost.some(req => player.inventory[req.item] >= 1);
-}
+// let statButtons = {};
 
-// Calculate cost based on current level
-function getUpgradeCost(stat) {
-    return baseUpgradeCosts[stat] + costIncreases[stat] * player.upgrades[stat];
-}
+// function drawCrafting(ctx) {
+//     // Background box
+//     ctx.fillStyle = "#222";
+//     ctx.fillRect(crX, crY, crW, crH);
+//     ctx.strokeStyle = "white";
+//     ctx.strokeRect(crX, crY, crW, crH);
+//     ctx.fillStyle = "white";
+//     ctx.font = "18px Arial";
+//     ctx.fillText("Crafting", crX + 15, crY + 25);
 
-function isCollidingWithWall(x, y) {
-    for (const wall of walls) {
-        // Find closest point on rectangle to the circle
-        const closestX = Math.max(wall.x, Math.min(x, wall.x + wall.width));
-        const closestY = Math.max(wall.y, Math.min(y, wall.y + wall.height));
-
-        // Find distance between circle center and that point
-        const dx = x - closestX;
-        const dy = y - closestY;
-
-        if (dx * dx + dy * dy < player.radius * player.radius) {
-            return true;
-        }
-    }
-    return false;
-}
+//     let y = 55;
+//     for (let key in recipes) {
+//         const recipe = recipes[key];
+//         if (!canSeeRecipe(recipe)) continue;
 
 
+//     }
+// }
 
+// function canSeeRecipe(recipe) {
+//     return recipe.cost.some(req => player.inventory[req.item] >= 1);
+// }
+
+// // Calculate cost based on current level
+// function getUpgradeCost(stat) {
+//     return baseUpgradeCosts[stat] + costIncreases[stat] * player.upgrades[stat];
+// }
+
+// function isCollidingWithWall(x, y) {
+//     for (const wall of walls) {
+//         // Find closest point on rectangle to the circle
+//         const closestX = Math.max(wall.x, Math.min(x, wall.x + wall.width));
+//         const closestY = Math.max(wall.y, Math.min(y, wall.y + wall.height));
+
+//         // Find distance between circle center and that point
+//         const dx = x - closestX;
+//         const dy = y - closestY;
+
+//         if (dx * dx + dy * dy < player.radius * player.radius) {
+//             return true;
+//         }
+//     }
+//     return false;
+// }
+
+
+// maybe reorganize later?
 function checkSwordHits() {
-    if (!player.isSwinging) return;
+    if (!player.sword.isSwinging) return;
 
-    firePatches.forEach(fire => {
-        if (!fire.isAlive || fire.isFading) return;
+    enemies.forEach(enemy => {
+        if (!enemy.isAlive || enemy.isFading) return;
 
         const angleOffset = 10 * Math.PI / 180;
         const adjustedFacingAngle = player.aimAngle + angleOffset;
 
-        const dx = fire.x - player.x;
-        const dy = fire.y - player.y;
+        const dx = enemy.x - player.x;
+        const dy = enemy.y - player.y;
         const dist = Math.sqrt(dx * dx + dy * dy);
 
-        const angleToFire = Math.atan2(dy, dx);
+        const angleToEnemy = Math.atan2(dy, dx);
         // difference between facing direction and fire direction
-        let angleDiff = Math.abs(angleToFire - adjustedFacingAngle);
+        let angleDiff = Math.abs(angleToEnemy - adjustedFacingAngle);
         if (angleDiff > Math.PI) angleDiff = 2 * Math.PI - angleDiff;
         // console.log("player.angle:", player.aimAngle, "angleToFire:", angleToFire, "diff:", angleDiff);
 
@@ -532,9 +537,9 @@ function checkSwordHits() {
         const swingArc = Math.PI * 72 / 180;
 
         // Sword hit range: within sword reach & in swing
-        if (dist < player.radius + fire.radius + 40 && angleDiff <= swingArc) {
-            fire.hit(player.damage, true, false);
-            if (fire.isFading) {
+        if (dist < player.radius + enemy.radius + 40 && angleDiff <= swingArc) {
+            enemy.takeDamage(player.damage, true, false);
+            if (enemy.isFading) {
                 for (let i = 0; i < fire.rarity.drops; i++) {
                     fireShards.push(new FireShard(fire.x, fire.y));
                     player.addXP(10);
@@ -589,7 +594,7 @@ function pickRarityByWeight(playerLevel) {
 }
 
 function spawnFirePatch() {
-    if (firePatches.length >= FIRE_CAP) return;
+    if (enemies.length >= FIRE_CAP) return;
     const rarityPicked = pickRarityByWeight(player.level);
 
     let tries = 0;
@@ -617,30 +622,29 @@ function spawnFirePatch() {
             continue;
         }
 
-        // 3. Avoid spawning on top of another fire patch
-        let tooCloseToFire = false;
-        for (const fire of firePatches) {
-            const distToFire = Math.hypot(x - fire.x, y - fire.y);
-            if (distToFire < fire.radius * 3) {
-                tooCloseToFire = true;
+        // 3. Avoid spawning on top of another enemy
+        let tooCloseToEnemy = false;
+        for (const enemy of enemies) {
+            const distToEnemy = Math.hypot(x - enemy.x, y - enemy.y);
+            if (distToEnemy < enemy.radius * 3) {
+                tooCloseToEnemy = true;
             }
         }
-        if (tooCloseToFire) {
+        if (tooCloseToEnemy) {
             tries++;
             continue;
         }
 
         // Valid location found
-        firePatches.push(new FirePatch(x, y, rarityPicked.key));
+        enemies.push(new FirePatch(x, y, rarityPicked.key));
         console.log("spawned", rarityPicked.key, rarityPicked.weight);
         return;
     }
 }
 
 function takeDamage(amount) {
-    player.hp -= amount;
-    if (player.hp < 0) {
-        player.hp = 0;
+    player.damageable.takeDamage(amount);
+    if (player.damageable.hp <= 0) {
         gameOver = true;
     }
     // console.log(`Player HP: ${player.hp}/${player.maxHp}`);
@@ -675,19 +679,17 @@ document.addEventListener("keydown", (e) => {
     keysPressed.add(e.key.toLowerCase());
     if (e.key == "q") player.mouseMovement = !player.mouseMovement;
     if (e.key == "z") {
-        inventoryOpen = !inventoryOpen;
-        statsOpen = false;
-        craftOpen = false;
+        inv.isOpen = !inv.isOpen;
+        stats.close();
     }
     if (e.key == "x") {
-        statsOpen = !statsOpen;
-        inventoryOpen = false;
-        craftOpen = false;
+        stats.isOpen = !stats.isOpen;
+        inv.close();
     }
     if (e.key == "c") {
-        craftOpen = !craftOpen;
-        inventoryOpen = false;
-        statsOpen = false;
+        // craftOpen = ;
+        // inventoryOpen = false;
+        // statsOpen = false;
     }
     if (e.code == "Space") mouseLeft = true;
     if (e.code == "ShiftLeft" || e.code == "ShiftRight") mouseRight = true;
@@ -716,30 +718,29 @@ canvas.addEventListener("mousedown", (e) => {
     // Check if inside button
     if (e.button === 0 && !gameOver && gameState === "playing") {
         if (mouseX >= inventoryButton.x && mouseX <= inventoryButton.x + inventoryButton.width && mouseY >= inventoryButton.y && mouseY <= inventoryButton.y + inventoryButton.height) {
-            statsOpen = false;
-            inventoryOpen = true;
+            stats.close();
+            inv.open();
             return; // returns so that it doesn't swing sword or block
         } else if (mouseX >= statsButton.x && mouseX <= statsButton.x + statsButton.width && mouseY >= statsButton.y && mouseY <= statsButton.y + statsButton.height) {
-            inventoryOpen = false;
-            statsOpen = true;
+            inv.close();
+            stats.open();
             return;
         } else {
-            if (inventoryOpen && !(mouseX >= invX && mouseX <= invX + invW && mouseY >= invY && mouseY <= invY + invH)) {
-                inventoryOpen = false;
+            if (inv.isOpen && !(mouseX >= inv.invX && mouseX <= inv.invX + inv.invW && mouseY >= inv.invY && mouseY <= inv.invY + inv.invH)) {
+                inv.close();
                 return;
-            } else if (statsOpen && !(mouseX >= stX && mouseX <= stX + stW && mouseY >= stY && mouseY <= stY + stH)) {
-                statsOpen = false;
+            } else if (stats.isOpen && !(mouseX >= stats.stX && mouseX <= stats.stX + stats.stW && mouseY >= stats.stY && mouseY <= stats.stY + stats.stH)) {
+                stats.close();
                 return;
-            } else if (!inventoryOpen && !statsOpen) {
+            } else if (!inv.isOpen && !stats.isOpen) {
                 mouseLeft = true;
             }
         }
     }
 
-    if (e.button === 2 && !gameOver && !inventoryOpen && !statsOpen) {
+    if (e.button === 2 && !gameOver && !inv.isOpen && !stats.isOpen) {
         mouseRight = true;
     }
-
 
 })
 
@@ -793,27 +794,27 @@ document.addEventListener("click", (e) => {
         ) {
             if (player.skillPoints >= btn.cost && player.upgrades[stat] < 9) {
                 player.skillPoints -= btn.cost;
-                player.upgrades[stat]++;
-
-                // Apply upgrade effect
-                switch (stat) {
-                    case "hp":
-                        let hpPerc = player.hp / player.maxHp;
-                        player.maxHp += statGains.hp * Math.pow(upgradeMultipliers.hp, player.upgrades[stat] - 1);
-                        player.hp = player.maxHp * hpPerc;
-                        break;
-                    case "bodyDamage":
-                        player.bodyDamage += statGains.bodyDamage * Math.pow(upgradeMultipliers.bodyDamage, player.upgrades[stat] - 1);
-                        break;
-                    case "speed":
-                        player.speed += statGains.speed * Math.pow(upgradeMultipliers.speed, player.upgrades[stat] - 1);
-                        break;
-                    case "regen":
-                        player.regenRate *= upgradeMultipliers.regen;
-                        break;
-                    case "strength":
-                        player.strength += statGains.strength * Math.pow(upgradeMultipliers.strength, player.upgrades[stat] - 1);
-                }
+                stats.upgrades[stat]++;
+                stats.boostStats(stat);
+                // // Apply upgrade effect
+                // switch (stat) {
+                //     case "hp":
+                //         let hpPerc = player.hp / player.maxHp;
+                //         player.maxHp += statGains.hp * Math.pow(upgradeMultipliers.hp, player.upgrades[stat] - 1);
+                //         player.hp = player.maxHp * hpPerc;
+                //         break;
+                //     case "bodyDamage":
+                //         player.bodyDamage += statGains.bodyDamage * Math.pow(upgradeMultipliers.bodyDamage, player.upgrades[stat] - 1);
+                //         break;
+                //     case "speed":
+                //         player.speed += statGains.speed * Math.pow(upgradeMultipliers.speed, player.upgrades[stat] - 1);
+                //         break;
+                //     case "regen":
+                //         player.regenRate *= upgradeMultipliers.regen;
+                //         break;
+                //     case "strength":
+                //         player.strength += statGains.strength * Math.pow(upgradeMultipliers.strength, player.upgrades[stat] - 1);
+                // }
             }
         }
     }
