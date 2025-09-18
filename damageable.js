@@ -1,4 +1,4 @@
-class Damageable {
+export default class Damageable {
     constructor(maxHp) {
         this.maxHp = maxHp;
         this.hp = maxHp;
