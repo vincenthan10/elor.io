@@ -1,3 +1,9 @@
+import Player from "./player.js";
+import FirePatch from "./firePatch.js";
+import FireShard from "./fireShard.js";
+import Inventory from "./inventory.js";
+import Upgrade from "./upgrade.js";
+
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 const keysPressed = new Set();
@@ -12,7 +18,7 @@ let mouseLeft = false;
 let mouseRight = false;
 
 // array - this is for enemy stat changes for different rarities
-const rarityTable = [
+export const rarityTable = [
     { key: "Common", weight: 50, sizeMult: 1.0, hpMult: 1.0, dmgMult: 1.0, xpMult: 1.0, drops: 1, color: "#4fbe53ff" },
     { key: "Unusual", weight: 25, sizeMult: 1.2, hpMult: 1.8, dmgMult: 1.6, xpMult: 2.0, drops: 1, color: "#f1de37ff" }, // 2.1, 1.9
     { key: "Rare", weight: 13, sizeMult: 1.4, hpMult: 4, dmgMult: 3, xpMult: 4.1, drops: 1, color: "#2c1bc6ff" }, // 4.6, 3.6
@@ -24,8 +30,8 @@ const rarityTable = [
 ]
 
 const enemies = [
-    new FirePatch(600, 400),
-    new FirePatch(900, 700)
+    new FirePatch(600, 400, "Common"),
+    new FirePatch(900, 700, "Common")
 ];
 // these 5 lines: maybe will be put into their respective enemy classes?
 const FIRE_CAP = 50;
@@ -44,7 +50,7 @@ const inventoryButton = {
     width: 100,
     height: 30
 }
-const inv = new Inventory(this.player);
+const inv = new Inventory(player, canvas);
 // const invX = 140;
 // const invY = canvas.height - 200;
 // const invW = 210;
@@ -57,7 +63,7 @@ const statsButton = {
     width: 100,
     height: 30
 }
-const stats = new Upgrade(this.player);
+const stats = new Upgrade(player, canvas);
 // const stX = 130;
 // const stY = canvas.height - 220;
 // const stW = 280;
@@ -170,7 +176,7 @@ function update(deltaTime) {
         updateCursor(deltaTime);
         return;
     }
-    player.update(deltaTime, keysPressed, camera, mapWidth, mapHeight, walls);
+    player.update(deltaTime, keysPressed, camera, mapWidth, mapHeight, walls, canvas);
     if (mouseLeft) {
         player.attack();
     }
@@ -196,7 +202,7 @@ function update(deltaTime) {
                 const now = performance.now();
 
                 if (!player.shield.isBlocking) {
-                    takeDamage(fire.damage);
+                    takeDamage(enemy.damage);
                 }
                 enemy.takeDamage(player.bodyDamage, false, true);
                 //enemy.lastDamageTime = now;
@@ -540,11 +546,11 @@ function checkSwordHits() {
         if (dist < player.radius + enemy.radius + 40 && angleDiff <= swingArc) {
             enemy.takeDamage(player.damage, true, false);
             if (enemy.isFading) {
-                for (let i = 0; i < fire.rarity.drops; i++) {
-                    fireShards.push(new FireShard(fire.x, fire.y));
+                for (let i = 0; i < enemy.rarity.drops; i++) {
+                    fireShards.push(new FireShard(enemy.x, enemy.y));
                     player.addXP(10);
                 }
-                player.addXP(fire.xp);
+                player.addXP(enemy.xp);
             }
         }
     })
