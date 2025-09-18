@@ -1,8 +1,12 @@
-class Enemy extends Entity {
+import Entity from "./entity.js";
+import Damageable from "./damageable.js";
+import { rarityTable } from "./main.js";
+export default class Enemy extends Entity {
     constructor(x, y, radius, hp, speed, damage, xp, rarityKey = null) {
-        const rarity = rarityKey ? rarityTable.find(r => r.key === rarityKey) : pickRarityByWeight();
-        const radius = Math.round(radius * rarity.sizeMult);
-        super(x, y, radius);
+        const rarity = rarityTable.find(r => r.key === rarityKey) || rarityTable[0];
+        const finalRadius = Math.round(radius * rarity.sizeMult);
+        console.log(rarity.key);
+        super(x, y, finalRadius);
         this.rarity = rarity;
         this.rarityColor = rarity.color;
         this.damageable = new Damageable(Math.max(1, Math.round(hp * rarity.hpMult)));
