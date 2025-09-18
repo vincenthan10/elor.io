@@ -1,4 +1,9 @@
-class Player extends Entity {
+import Entity from "./entity.js";
+import Damageable from "./damageable.js";
+import Sword from "./sword.js";
+import Shield from "./shield.js";
+
+export default class Player extends Entity {
     constructor(x, y) {
         super(x, y, 20);
         this.damageable = new Damageable(10);
@@ -92,7 +97,7 @@ class Player extends Entity {
         }
     }
 
-    update(deltaTime, keysPressed, camera, mapWidth, mapHeight, walls) {
+    update(deltaTime, keysPressed, camera, mapWidth, mapHeight, walls, canvas) {
         // Movement and boundaries
         //keyboard movement
         let dx = 0;
@@ -128,14 +133,14 @@ class Player extends Entity {
         if (!this.mouseMovement) {
             let newX = this.x + dx;
             let newY = this.y + dy;
-            if (!isCollidingWithWall(newX, this.y, walls)) this.x = newX;
-            if (!isCollidingWithWall(this.x, newY, walls)) this.y = newY;
+            if (!this.isCollidingWithWall(newX, this.y, walls)) this.x = newX;
+            if (!this.isCollidingWithWall(this.x, newY, walls)) this.y = newY;
         } else {
             // mouse movement
             let newX = this.x + this.dx;
             let newY = this.y + this.dy;
-            if (!isCollidingWithWall(newX, this.y, walls)) this.x = newX;
-            if (!isCollidingWithWall(this.x, newY, walls)) this.y = newY;
+            if (!this.isCollidingWithWall(newX, this.y, walls)) this.x = newX;
+            if (!this.isCollidingWithWall(this.x, newY, walls)) this.y = newY;
         }
 
         camera.x = this.x - canvas.width / 2;
@@ -164,7 +169,7 @@ class Player extends Entity {
             const dx = x - closestX;
             const dy = y - closestY;
 
-            if (dx * dx + dy * dy < player.radius * player.radius) {
+            if (dx * dx + dy * dy < this.radius * this.radius) {
                 return true;
             }
         }
