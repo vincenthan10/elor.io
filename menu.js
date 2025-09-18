@@ -1,4 +1,4 @@
-class Menu {
+export default class Menu {
     constructor(options = []) {
         this.selectedIndex = 0;
         this.isOpen = false;
