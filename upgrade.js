@@ -1,11 +1,12 @@
-class Upgrade extends Menu {
-    constructor(player) {
+import Menu from "./menu.js";
+export default class Upgrade extends Menu {
+    constructor(player, canvas) {
         super([]);
         this.player = player;
-        const stX = 130;
-        const stY = canvas.height - 220;
-        const stW = 280;
-        const stH = 200;
+        this.stX = 130;
+        this.stY = canvas.height - 220;
+        this.stW = 280;
+        this.stH = 200;
         this.upgrades = {
             hp: 0,
             strength: 0,
@@ -68,17 +69,17 @@ class Upgrade extends Menu {
 
         // Background
         ctx.fillStyle = "rgba(0, 0, 0, 0.8)";
-        ctx.fillRect(stX, stY, stW, stH);
+        ctx.fillRect(this.stX, this.stY, this.stW, this.stH);
         ctx.strokeStyle = "white";
-        ctx.strokeRect(stX, stY, stW, stH);
+        ctx.strokeRect(this.stX, this.stY, this.stW, this.stH);
 
         ctx.fillStyle = "white";
         ctx.font = "18px Arial";
-        ctx.fillText("Stats Menu", stX + 10, stY + 30);
+        ctx.fillText("Stats Menu", this.stX + 10, this.stY + 30);
 
         ctx.font = "14px Arial";
         // Skill points in top right
-        ctx.fillText(`Skill Points: ${this.player.skillPoints}`, stX + stW - 92, stY + 25);
+        ctx.fillText(`Skill Points: ${this.player.skillPoints}`, this.stX + this.stW - 92, this.stY + 25);
 
         const stats = [
             { name: "HP", value: this.player.maxHp.toFixed(1), key: "hp" },
@@ -87,7 +88,7 @@ class Upgrade extends Menu {
             { name: "Speed", value: this.player.speed.toFixed(1), key: "speed" },
             { name: "Regen", value: (this.player.regenRate * 1000).toFixed(3) + "/s", key: "regen" }
         ];
-        const startY = stY + 60;
+        const startY = this.stY + 60;
         const lineHeight = 30;
 
         stats.forEach((stat, i) => {
@@ -95,10 +96,10 @@ class Upgrade extends Menu {
             const cost = getUpgradeCost(stat.key);
 
             ctx.fillStyle = "white";
-            ctx.fillText(`${stat.name}: ${stat.value}  (Lvl ${this.upgrades[stat.key]}/${this.maxUpgrades[stat.key]})`, stX + 10, y);
+            ctx.fillText(`${stat.name}: ${stat.value}  (Lvl ${this.upgrades[stat.key]}/${this.maxUpgrades[stat.key]})`, this.stX + 10, y);
 
             // Draw upgrade button
-            const btnX = stX + stW - 90;
+            const btnX = this.stX + this.stW - 90;
             const btnY = y - 14;
             const btnW = 80;
             const btnH = 20;
