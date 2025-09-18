@@ -1,12 +1,13 @@
-class Inventory extends Menu {
-    constructor(player) {
+import Menu from "./menu.js";
+export default class Inventory extends Menu {
+    constructor(player, canvas) {
         super([]);
         this.player = player;
 
-        const invX = 140;
-        const invY = canvas.height - 200;
-        const invW = 210;
-        const invH = 180;
+        this.invX = 140;
+        this.invY = canvas.height - 200;
+        this.invW = 210;
+        this.invH = 180;
     }
 
     open() {
@@ -21,12 +22,12 @@ class Inventory extends Menu {
 
         // Background box
         ctx.fillStyle = "#222";
-        ctx.fillRect(invX, invY, invW, invH);
+        ctx.fillRect(this.invX, this.invY, this.invW, this.invH);
         ctx.strokeStyle = "white";
-        ctx.strokeRect(invX, invY, invW, invH);
+        ctx.strokeRect(this.invX, this.invY, this.invW, this.invH);
         ctx.fillStyle = "white";
         ctx.font = "18px Arial";
-        ctx.fillText("Inventory", invX + 10, invY + 25);
+        ctx.fillText("Inventory", this.invX + 10, this.invY + 25);
 
         let offsetY = 50;
         for (const key in this.player.inventory) {
@@ -35,14 +36,14 @@ class Inventory extends Menu {
             // Try to get class from registry
             const ItemClass = ItemRegistry[key];
             if (ItemClass && typeof ItemClass.prototype.drawIcon === "function") {
-                const iconX = invX + 10;
-                const iconY = invY + offsetY - 10;
+                const iconX = this.invX + 10;
+                const iconY = this.invY + offsetY - 10;
                 ItemClass.drawIcon(ctx, iconX, iconY);
             }
         }
         ctx.fillStyle = "white";
         ctx.font = "14px Arial";
-        ctx.fillText(`${key}: ${amount}`, invX, invY + offsetY);
+        ctx.fillText(`${key}: ${amount}`, this.invX, this.invY + offsetY);
 
         offsetY += 30;
 
