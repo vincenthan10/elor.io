@@ -1,4 +1,4 @@
-class Collectible {
+export default class Collectible {
     constructor(x, y, amount = 1, interactable = true, key = "generic") {
         this.x = x;
         this.y = y;
