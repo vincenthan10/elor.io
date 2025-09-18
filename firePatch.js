@@ -1,10 +1,10 @@
-class FirePatch extends Enemy {
+import Enemy from "./enemy.js";
+import { rarityTable } from "./main.js";
+export default class FirePatch extends Enemy {
 
     constructor(x, y, rarityKey = null) {
 
-        const rarity = rarityKey ? rarityTable.find(r => r.key === rarityKey) : pickRarityByWeight();
-        this.rarity = rarity;
-        this.rarityColor = this.rarity.color;
+        const rarity = rarityTable.find(r => r.key === rarityKey) || rarityTable[0];
 
         const baseRadius = 20;
         const baseHp = 14;
@@ -12,17 +12,21 @@ class FirePatch extends Enemy {
         const baseXp = 3;
 
         super(x, y, baseRadius, baseHp, 0, baseDamage, baseXp, rarityKey);
+
+        this.rarity = rarity;
+        this.rarityColor = this.rarityColor;
+
     }
 
     update(deltaTime) {
-        super(deltaTime);
+        super.update(deltaTime);
     }
 
     draw(ctx, camera) {
         if (!this.isAlive) return;
 
         ctx.save();
-        ctx.globalAlpha = this.fadeAlpha;
+        ctx.globalAlpha = this.damageable.fadeTime;
 
         // Flickering fire
         const flickerSize = this.radius + Math.random() * 2;
@@ -38,7 +42,7 @@ class FirePatch extends Enemy {
         ctx.fillRect(this.x - camera.x - this.radius, this.y - camera.y + this.radius * 1.25, this.radius * 1.4, this.radius / 5);
 
         ctx.fillStyle = "limegreen";
-        ctx.fillRect(this.x - camera.x - this.radius, this.y - camera.y + this.radius * 1.25, (this.hp / this.maxHp) * (this.radius * 1.4), this.radius / 5);
+        ctx.fillRect(this.x - camera.x - this.radius, this.y - camera.y + this.radius * 1.25, (this.damageable.hp / this.damageable.maxHp) * (this.radius * 1.4), this.radius / 5);
 
         // Rarity text to right of bar (color-coded)
         ctx.font = `${Math.round(this.radius / 5 + 3)}px Arial`;
