@@ -1,4 +1,5 @@
-class FireShard {
+import Collectible from "./collectible.js";
+export default class FireShard extends Collectible {
     constructor(x, y, amount = 1, interactable = true) {
         super(x, y, amount, interactable, "Fire Shard");
         this.width = 16;
