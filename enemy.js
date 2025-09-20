@@ -5,11 +5,10 @@ export default class Enemy extends Entity {
     constructor(x, y, radius, hp, speed, damage, xp, rarityKey = null) {
         const rarity = rarityTable.find(r => r.key === rarityKey) || rarityTable[0];
         const finalRadius = Math.round(radius * rarity.sizeMult);
-        console.log(rarity.key);
         super(x, y, finalRadius);
         this.rarity = rarity;
         this.rarityColor = rarity.color;
-        this.damageable = new Damageable(Math.max(1, Math.round(hp * rarity.hpMult)));
+        this.damageable = new Damageable(Math.max(1, Math.round(hp * rarity.hpMult)), this);
         this.speed = speed;
         this.damage = Math.max(1, Math.round(damage * rarity.dmgMult));
         this.xp = Math.max(1, Math.round(xp * rarity.xpMult));
