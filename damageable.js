@@ -1,9 +1,10 @@
 export default class Damageable {
-    constructor(maxHp) {
+    constructor(maxHp, owner) {
         this.maxHp = maxHp;
         this.hp = maxHp;
         this.isFading = false;
         this.fadeTime = 1;
+        this.owner = owner;
 
         this.weaponHitCooldown = 0;
         this.bodyHitCooldown = 0;
@@ -12,27 +13,34 @@ export default class Damageable {
     takeDamage(amount, sword, body) {
         if (this.isFading) return;
         if (sword) {
-            if (this.hitCooldown > 0) return;
-            this.hitCooldown = 300;
+            if (this.weaponHitCooldown > 0) return;
+            this.weaponHitCooldown = 300;
         }
         if (body) {
             if (this.bodyHitCooldown > 0) return;
             this.bodyHitCooldown = 500;
         }
         this.hp -= amount;
-        if (this.hp <= 0) this.startFade();
+        if (this.hp <= 0) {
+            this.startFade();
+        }
     }
 
     startFade() {
         this.hp = 0;
         this.isFading = true;
-        this.isAlive = false;
+
     }
 
     update(deltaTime) {
         if (this.isFading) {
             this.fadeTime -= deltaTime / 300;
-            if (this.fadeTime <= 0) this.isFading = false;
+            if (this.fadeTime <= 0) {
+                this.isFading = false;
+                if (this.owner) {
+                    this.owner.isAlive = false;
+                }
+            }
         }
         if (this.bodyHitCooldown > 0) {
             this.bodyHitCooldown -= deltaTime;
