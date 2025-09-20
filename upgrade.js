@@ -3,6 +3,7 @@ export default class Upgrade extends Menu {
     constructor(player, canvas) {
         super([]);
         this.player = player;
+        this.canvas = canvas;
         this.stX = 130;
         this.stY = canvas.height - 220;
         this.stW = 280;
