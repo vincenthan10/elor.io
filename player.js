@@ -6,7 +6,7 @@ import Shield from "./shield.js";
 export default class Player extends Entity {
     constructor(x, y) {
         super(x, y, 20);
-        this.damageable = new Damageable(10);
+        this.damageable = new Damageable(10, this);
         this.speed = 2.5;
         this.aimAngle = 0;
         this.level = 1;
@@ -34,7 +34,7 @@ export default class Player extends Entity {
         this.mouseMovement = false;
 
         // Inventory
-        this.inventory = {};
+        this.inventory = { fireShard: 0 };
     }
 
     addXP(amount) {
@@ -100,56 +100,60 @@ export default class Player extends Entity {
     update(deltaTime, keysPressed, camera, mapWidth, mapHeight, walls, canvas) {
         // Movement and boundaries
         //keyboard movement
-        let dx = 0;
-        let dy = 0;
-        if (!this.mouseMovement) {
-            if (keysPressed.has("w") || keysPressed.has("arrowup")) dy -= this.speed;
-            if (keysPressed.has("s") || keysPressed.has("arrowdown")) dy += this.speed;
-            if (keysPressed.has("a") || keysPressed.has("arrowleft")) dx -= this.speed;
-            if (keysPressed.has("d") || keysPressed.has("arrowright")) dx += this.speed;
-            if (dx !== 0 && dy !== 0) {
-                dx /= Math.sqrt(2);
-                dy /= Math.sqrt(2);
+        if (!this.damageable.isFading) {
+            let dx = 0;
+            let dy = 0;
+            if (!this.mouseMovement) {
+                if (keysPressed.has("w") || keysPressed.has("arrowup")) dy -= this.speed;
+                if (keysPressed.has("s") || keysPressed.has("arrowdown")) dy += this.speed;
+                if (keysPressed.has("a") || keysPressed.has("arrowleft")) dx -= this.speed;
+                if (keysPressed.has("d") || keysPressed.has("arrowright")) dx += this.speed;
+                if (dx !== 0 && dy !== 0) {
+                    dx /= Math.sqrt(2);
+                    dy /= Math.sqrt(2);
+                }
             }
-        }
-        // disallow player to move past boundaries
-        if (this.x - this.radius <= 0 && (this.dx < 0 || dx < 0)) {
-            dx = 0;
-            this.dx = 0;
-        }
-        if (this.x + this.radius >= mapWidth && (this.dx > 0 || dx > 0)) {
-            dx = 0;
-            this.dx = 0;
-        }
-        if (this.y - this.radius <= 0 && (this.dy < 0 || dy < 0)) {
-            dy = 0;
-            this.dy = 0;
-        }
-        if (this.y + this.radius >= mapHeight && (this.dy > 0 || dy > 0)) {
-            dy = 0;
-            this.dy = 0;
+            // disallow player to move past boundaries
+            if (this.x - this.radius <= 0 && (this.dx < 0 || dx < 0)) {
+                dx = 0;
+                this.dx = 0;
+            }
+            if (this.x + this.radius >= mapWidth && (this.dx > 0 || dx > 0)) {
+                dx = 0;
+                this.dx = 0;
+            }
+            if (this.y - this.radius <= 0 && (this.dy < 0 || dy < 0)) {
+                dy = 0;
+                this.dy = 0;
+            }
+            if (this.y + this.radius >= mapHeight && (this.dy > 0 || dy > 0)) {
+                dy = 0;
+                this.dy = 0;
+            }
+
+            if (!this.mouseMovement) {
+                let newX = this.x + dx;
+                let newY = this.y + dy;
+                if (!this.isCollidingWithWall(newX, this.y, walls)) this.x = newX;
+                if (!this.isCollidingWithWall(this.x, newY, walls)) this.y = newY;
+            } else {
+                // mouse movement
+                let newX = this.x + this.dx;
+                let newY = this.y + this.dy;
+                if (!this.isCollidingWithWall(newX, this.y, walls)) this.x = newX;
+                if (!this.isCollidingWithWall(this.x, newY, walls)) this.y = newY;
+            }
+
+            camera.x = this.x - canvas.width / 2;
+            camera.y = this.y - canvas.height / 2;
+
+            // clamp camera so it doesn't scroll past the map
+            camera.x = Math.max(0, Math.min(camera.x, mapWidth - canvas.width));
+            camera.y = Math.max(0, Math.min(camera.y, mapHeight - canvas.height));
         }
 
-        if (!this.mouseMovement) {
-            let newX = this.x + dx;
-            let newY = this.y + dy;
-            if (!this.isCollidingWithWall(newX, this.y, walls)) this.x = newX;
-            if (!this.isCollidingWithWall(this.x, newY, walls)) this.y = newY;
-        } else {
-            // mouse movement
-            let newX = this.x + this.dx;
-            let newY = this.y + this.dy;
-            if (!this.isCollidingWithWall(newX, this.y, walls)) this.x = newX;
-            if (!this.isCollidingWithWall(this.x, newY, walls)) this.y = newY;
-        }
 
-        camera.x = this.x - canvas.width / 2;
-        camera.y = this.y - canvas.height / 2;
-
-        // clamp camera so it doesn't scroll past the map
-        camera.x = Math.max(0, Math.min(camera.x, mapWidth - canvas.width));
-        camera.y = Math.max(0, Math.min(camera.y, mapHeight - canvas.height));
-
+        this.damageable.update(deltaTime);
         this.sword.swing(deltaTime);
         this.shield.block(deltaTime);
         this.damage = this.strength + this.swordDamage;
@@ -178,7 +182,10 @@ export default class Player extends Entity {
 
 
     draw(ctx, camera) {
-        if (this.hp <= 0) return;
+        if (!this.isAlive && !this.damageable.isFading) return;
+        ctx.save();
+        ctx.globalAlpha = this.damageable.fadeTime;
+
         ctx.beginPath();
         // draws player (always centered on camera)
         ctx.arc(this.x - camera.x, this.y - camera.y, this.radius, 0, Math.PI * 2);
@@ -191,9 +198,12 @@ export default class Player extends Entity {
         ctx.fillRect(this.x - camera.x - this.radius, this.y - camera.y + this.radius * 1.25, this.radius * 2, this.radius / 5);
 
         ctx.fillStyle = "limegreen";
-        ctx.fillRect(this.x - camera.x - this.radius, this.y - camera.y + this.radius * 1.25, (this.hp / this.maxHp) * (this.radius * 2), this.radius / 5);
+        ctx.fillRect(this.x - camera.x - this.radius, this.y - camera.y + this.radius * 1.25, (this.damageable.hp / this.damageable.maxHp) * (this.radius * 2), this.radius / 5);
 
         this.sword.draw(ctx, camera, this);
         this.shield.draw(ctx, camera, this);
+
+        ctx.restore();
+
     }
 }
