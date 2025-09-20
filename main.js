@@ -177,6 +177,7 @@ function update(deltaTime) {
         return;
     }
     player.update(deltaTime, keysPressed, camera, mapWidth, mapHeight, walls, canvas);
+
     if (mouseLeft) {
         player.attack();
     }
@@ -188,6 +189,14 @@ function update(deltaTime) {
     // Remove dead enemies
     for (let i = enemies.length - 1; i >= 0; i--) {
         if (!enemies[i].isAlive) {
+            const enemy = enemies[i];
+            for (let j = 0; j < enemy.rarity.drops; j++) {
+                const offsetX = (Math.random() - 0.5) * 20;
+                const offsetY = (Math.random() - 0.5) * 20;
+                fireShards.push(new FireShard(enemy.x + offsetX, enemy.y + offsetY));
+                player.addXP(10);
+            }
+            player.addXP(enemy.xp);
             enemies.splice(i, 1);
         }
     }
@@ -202,20 +211,10 @@ function update(deltaTime) {
                 const now = performance.now();
 
                 if (!player.shield.isBlocking) {
-                    takeDamage(enemy.damage);
+                    takeDamage(enemy.damage, false, true);
                 }
-                enemy.takeDamage(player.bodyDamage, false, true);
+                enemy.damageable.takeDamage(player.bodyDamage, false, true);
                 //enemy.lastDamageTime = now;
-                // maybe change later to give enemies their own drops
-                if (enemy.isFading) {
-                    for (let i = 0; i < enemy.rarity.drops; i++) {
-                        const offsetX = (Math.random() - 0.5) * 20;
-                        const offsetY = (Math.random() - 0.5) * 20;
-                        fireShards.push(new FireShard(enemy.x + offsetX, enemy.y + offsetY));
-                        player.addXP(10);
-                    }
-                    player.addXP(enemy.xp);
-                }
 
             }
         }
@@ -243,8 +242,9 @@ function update(deltaTime) {
             const shardRadius = Math.max(shard.width, shard.height) / 2;
             if (dist < player.radius + shardRadius) {
                 shard.isCollected = true;
+                shard.isAlive = false;
                 // increase inventory count
-                player.inventory.push(new FireShard(-500, -500, 1, false));
+                inv.addItem('fireShard', 1);
             }
         }
     })
@@ -344,7 +344,7 @@ function draw() {
     ctx.fillStyle = "red";
     ctx.fillRect(10, 10, 125, 25);
     ctx.fillStyle = "limegreen";
-    ctx.fillRect(10, 10, (player.hp / player.maxHp) * 125, 25);
+    ctx.fillRect(10, 10, (player.damageable.hp / player.damageable.maxHp) * 125, 25);
     ctx.strokeStyle = "black";
     ctx.strokeRect(10, 10, 125, 25);
     ctx.fillStyle = "white";
@@ -544,14 +544,7 @@ function checkSwordHits() {
 
         // Sword hit range: within sword reach & in swing
         if (dist < player.radius + enemy.radius + 40 && angleDiff <= swingArc) {
-            enemy.takeDamage(player.damage, true, false);
-            if (enemy.isFading) {
-                for (let i = 0; i < enemy.rarity.drops; i++) {
-                    fireShards.push(new FireShard(enemy.x, enemy.y));
-                    player.addXP(10);
-                }
-                player.addXP(enemy.xp);
-            }
+            enemy.damageable.takeDamage(player.damage, true, false);
         }
     })
 }
@@ -649,8 +642,8 @@ function spawnFirePatch() {
 }
 
 function takeDamage(amount) {
-    player.damageable.takeDamage(amount);
-    if (player.damageable.hp <= 0) {
+    player.damageable.takeDamage(amount, false, true);
+    if (!player.isAlive && !player.damageable.isFading) {
         gameOver = true;
     }
     // console.log(`Player HP: ${player.hp}/${player.maxHp}`);
@@ -700,9 +693,11 @@ document.addEventListener("keydown", (e) => {
     if (e.code == "Space") mouseLeft = true;
     if (e.code == "ShiftLeft" || e.code == "ShiftRight") mouseRight = true;
     if (e.code == "Enter" && gameOver) {
+        player.isAlive = true;
         player.x = playerSpawnX;
         player.y = playerSpawnY;
-        player.hp = player.maxHp;
+        player.damageable.hp = player.damageable.maxHp;
+        player.damageable.fadeTime = 1;
         gameOver = false;
     }
 
@@ -752,9 +747,11 @@ canvas.addEventListener("mousedown", (e) => {
 
 document.addEventListener("mousedown", (e) => {
     if (e.button === 0 && gameOver) {
-        player.hp = player.maxHp;
+        player.isAlive = true;
+        player.damageable.hp = player.damageable.maxHp;
         player.x = playerSpawnX;
         player.y = playerSpawnY;
+        player.damageable.fadeTime = 1;
         gameOver = false;
     }
 })
