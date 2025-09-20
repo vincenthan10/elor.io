@@ -7,14 +7,14 @@ export default class FirePatch extends Enemy {
         const rarity = rarityTable.find(r => r.key === rarityKey) || rarityTable[0];
 
         const baseRadius = 20;
-        const baseHp = 14;
+        const baseHp = 4;
         const baseDamage = 4;
         const baseXp = 3;
 
         super(x, y, baseRadius, baseHp, 0, baseDamage, baseXp, rarityKey);
 
         this.rarity = rarity;
-        this.rarityColor = this.rarityColor;
+        this.rarityColor = rarity.color;
 
     }
 
@@ -23,7 +23,7 @@ export default class FirePatch extends Enemy {
     }
 
     draw(ctx, camera) {
-        if (!this.isAlive) return;
+        if (!this.isAlive && !this.damageable.isFading) return;
 
         ctx.save();
         ctx.globalAlpha = this.damageable.fadeTime;
@@ -34,7 +34,6 @@ export default class FirePatch extends Enemy {
         ctx.arc(this.x - camera.x, this.y - camera.y, flickerSize, 0, Math.PI * 2);
         ctx.fillStyle = `hsl(${Math.random() * 30}, 100%, 50%)`; //yellow/orange
         ctx.fill();
-        ctx.restore();
 
 
         // HP bar
@@ -50,6 +49,7 @@ export default class FirePatch extends Enemy {
         ctx.textAlign = "left";
         ctx.fillStyle = this.rarityColor;
         ctx.fillText(this.rarity.key, this.x - camera.x - this.radius + this.radius * 1.4 + 6, this.y - camera.y + this.radius * 1.25 + this.radius / 5 / 2);
+        ctx.restore();
 
 
     }
