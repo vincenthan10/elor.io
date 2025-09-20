@@ -3,6 +3,8 @@ export default class Inventory extends Menu {
     constructor(player, canvas) {
         super([]);
         this.player = player;
+        this.canvas = canvas;
+        this.items = {}; //internal map
 
         this.invX = 140;
         this.invY = canvas.height - 200;
@@ -16,6 +18,12 @@ export default class Inventory extends Menu {
 
     close() {
         super.close();
+    }
+
+    addItem(key, amount = 1) {
+        this.items[key] = (this.items[key] || 0) + amount;
+        this.player.inventory = this.items;
+        console.log(this.player.inventory);
     }
 
     draw(ctx) {
