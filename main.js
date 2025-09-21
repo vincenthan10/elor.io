@@ -177,6 +177,10 @@ function update(deltaTime) {
         return;
     }
     player.update(deltaTime, keysPressed, camera, mapWidth, mapHeight, walls, canvas);
+    if (!player.isAlive) {
+        gameOver = true;
+        return; // ensuring death
+    }
 
     if (mouseLeft) {
         player.attack();
@@ -244,7 +248,7 @@ function update(deltaTime) {
                 shard.isCollected = true;
                 shard.isAlive = false;
                 // increase inventory count
-                inv.addItem('fireShard', 1);
+                inv.addItem(shard.key, 1);
             }
         }
     })
@@ -294,6 +298,7 @@ function draw() {
     ctx.strokeStyle = "red";
     ctx.lineWidth = 5;
     ctx.strokeRect(-camera.x, -camera.y, mapWidth, mapHeight);
+    ctx.lineWidth = 4;
 
     for (const wall of walls) {
         ctx.fillStyle = "#FF4400";
@@ -643,7 +648,7 @@ function spawnFirePatch() {
 
 function takeDamage(amount) {
     player.damageable.takeDamage(amount, false, true);
-    if (!player.isAlive && !player.damageable.isFading) {
+    if (!player.isAlive) {
         gameOver = true;
     }
     // console.log(`Player HP: ${player.hp}/${player.maxHp}`);
@@ -690,7 +695,9 @@ document.addEventListener("keydown", (e) => {
         // inventoryOpen = false;
         // statsOpen = false;
     }
-    if (e.code == "Space") mouseLeft = true;
+    if (e.code == "Space") {
+        mouseLeft = true;
+    }
     if (e.code == "ShiftLeft" || e.code == "ShiftRight") mouseRight = true;
     if (e.code == "Enter" && gameOver) {
         player.isAlive = true;
