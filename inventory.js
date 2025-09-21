@@ -1,15 +1,24 @@
 import Menu from "./menu.js";
+import { ItemRegistry } from "./itemRegistry.js";
 export default class Inventory extends Menu {
     constructor(player, canvas) {
         super([]);
         this.player = player;
         this.canvas = canvas;
-        this.items = {}; //internal map
+        this.items = {
+            // "Fire Shard": { amount: 0 },
+            // "Basic Sword": { amount: 1 },
+            // "Basic Shield": { amount: 1 }
+        }; //internal map
 
         this.invX = 140;
-        this.invY = canvas.height - 200;
+        this.invY = canvas.height - 250;
         this.invW = 210;
-        this.invH = 180;
+        this.invH = 230;
+
+        this.cellSize = 50;
+        this.cols = 4;
+        this.padding = 10; // spacing between cells
     }
 
     open() {
@@ -21,9 +30,10 @@ export default class Inventory extends Menu {
     }
 
     addItem(key, amount = 1) {
-        this.items[key] = (this.items[key] || 0) + amount;
-        this.player.inventory = this.items;
-        console.log(this.player.inventory);
+        if (!this.items[key]) {
+            this.items[key] = { amount: 0 };
+        }
+        this.items[key].amount += amount;
     }
 
     draw(ctx) {
@@ -33,27 +43,70 @@ export default class Inventory extends Menu {
         ctx.fillRect(this.invX, this.invY, this.invW, this.invH);
         ctx.strokeStyle = "white";
         ctx.strokeRect(this.invX, this.invY, this.invW, this.invH);
+
         ctx.fillStyle = "white";
         ctx.font = "18px Arial";
-        ctx.fillText("Inventory", this.invX + 10, this.invY + 25);
+        ctx.fillText("Inventory", this.invX + 69, this.invY + 25);
 
-        let offsetY = 50;
-        for (const key in this.player.inventory) {
-            const amount = this.player.inventory[key].amount;
+        const keys = Object.keys(this.items);
 
-            // Try to get class from registry
+        if (keys.length === 0) {
+            ctx.fillStyle = "gray";
+            ctx.font = "14px";
+            ctx.fillText("Empty", this.invX + 77, this.invY + 90);
+            return;
+        }
+
+        // Draw grid slots
+        let row = 0;
+        let col = 0;
+
+        for (const key of keys) {
+            const item = this.items[key];
+            const x = this.invX + this.padding + col * (this.cellSize + this.padding);
+            const y = this.invY + 40 + row * (this.cellSize + this.padding);
+
+            // Draw slot box
+            ctx.strokeStyle = "white";
+            ctx.lineWidth = 1.5;
+            ctx.strokeRect(x, y, this.cellSize, this.cellSize);
+
+            // Draw icon if available
             const ItemClass = ItemRegistry[key];
-            if (ItemClass && typeof ItemClass.prototype.drawIcon === "function") {
-                const iconX = this.invX + 10;
-                const iconY = this.invY + offsetY - 10;
-                ItemClass.drawIcon(ctx, iconX, iconY);
+
+            if (ItemClass && typeof ItemClass.drawIcon === "function") {
+                const iconX = x + this.cellSize / 2.2;
+                const iconY = y + this.cellSize / 2.8;
+                ItemClass.drawIcon(ctx, iconX, iconY, 1.25);
+            }
+
+            // Draw item count (bottom-right corner)
+            ctx.fillStyle = "white";
+            ctx.font = "9px Arial";
+            ctx.textAlign = "right";
+            ctx.textBaseline = "top";
+            ctx.fillText(`x${item.amount}`, x + this.cellSize - 2, y + 2);
+
+            // Draw item name (below the slot)
+            ctx.fillStyle = "white";
+            ctx.font = "9px Arial";
+            ctx.textAlign = "center";
+            ctx.textBaseline = "bottom";
+            ctx.fillText(key, x + this.cellSize / 2, y + this.cellSize - 2);
+
+            // Advance grid position
+            col++;
+            if (col >= this.cols) {
+                col = 0;
+                row++;
             }
         }
-        ctx.fillStyle = "white";
-        ctx.font = "14px Arial";
-        ctx.fillText(`${key}: ${amount}`, this.invX, this.invY + offsetY);
+        ctx.lineWidth = 4;
 
-        offsetY += 30;
+        // Reset text alignment
+        ctx.textAlign = "left";
+        ctx.textBaseline = "alphabetic";
+
 
     }
 }
