@@ -26,15 +26,13 @@ export default class Player extends Entity {
         this.sword = new Sword();
         this.shield = new Shield();
 
-        this.damage = this.strength + this.swordDamage;
+        this.damage = this.strength + this.sword.damage;
 
         // Mouse movement
         this.dx = 0;
         this.dy = 0;
         this.mouseMovement = false;
 
-        // Inventory
-        this.inventory = { fireShard: 0 };
     }
 
     addXP(amount) {
@@ -81,7 +79,7 @@ export default class Player extends Entity {
 
     attack() {
         const now = performance.now();
-        if (!this.sword.isSwinging && now - this.sword.lastSwingTime >= this.sword.timeSinceLastSwing) {
+        if (!this.sword.isSwinging && now - this.sword.timeSinceLastSwing >= this.sword.cooldown) {
             this.sword.isSwinging = true;
             this.sword.swingTimer = 0;
             this.sword.timeSinceLastSwing = now;
@@ -156,7 +154,7 @@ export default class Player extends Entity {
         this.damageable.update(deltaTime);
         this.sword.swing(deltaTime);
         this.shield.block(deltaTime);
-        this.damage = this.strength + this.swordDamage;
+        this.damage = this.strength + this.sword.damage;
 
         this.checkLevelUp();
         this.passiveRegen(deltaTime);
