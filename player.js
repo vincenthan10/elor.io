@@ -49,13 +49,13 @@ export default class Player extends Entity {
             this.skillPoints += pointsGained;
 
             // Calculate current HP percentage before increasing maxHp
-            const currentHpPerc = this.hp / this.maxHp;
+            const currentHpPerc = this.damageable.hp / this.damageable.maxHp;
             this.xpNeeded *= this.XP_GROWTH_RATE;
             if (this.level <= 100) {
-                this.maxHp += 1 * Math.pow(this.HP_GROWTH_RATE, this.level - 1);
+                this.damageable.maxHp += 1 * Math.pow(this.HP_GROWTH_RATE, this.level - 1);
                 this.bodyDamage += 0.1 * Math.pow(this.BODY_DAMAGE_GROWTH_RATE, this.level - 1);
                 this.strength += 0.1 * Math.pow(this.STRENGTH_GROWTH_RATE, this.level - 1);
-                this.hp = this.maxHp * currentHpPerc;
+                this.damageable.hp = this.damageable.maxHp * currentHpPerc;
             }
 
             // console.log(`Player level: ${this.level}`);
@@ -72,8 +72,8 @@ export default class Player extends Entity {
     }
 
     passiveRegen(deltaTime) {
-        if (this.regenUnlocked && this.hp < this.maxHp) {
-            this.hp = Math.min(this.hp + this.regenRate * deltaTime, this.maxHp);
+        if (this.regenUnlocked && this.damageable.hp < this.damageable.maxHp) {
+            this.damageable.hp = Math.min(this.damageable.hp + this.regenRate * deltaTime, this.damageable.maxHp);
         }
     }
 
