@@ -796,13 +796,13 @@ document.addEventListener("click", (e) => {
     const mouseX = e.clientX - rect.left;
     const mouseY = e.clientY - rect.top;
 
-    for (let stat in statButtons) {
-        const btn = statButtons[stat];
+    for (let stat in stats.statButtons) {
+        const btn = stats.statButtons[stat];
         if (
             mouseX >= btn.x && mouseX <= btn.x + btn.w &&
             mouseY >= btn.y && mouseY <= btn.y + btn.h
         ) {
-            if (player.skillPoints >= btn.cost && player.upgrades[stat] < 9) {
+            if (player.skillPoints >= btn.cost && stats.upgrades[stat] < 9) {
                 player.skillPoints -= btn.cost;
                 stats.upgrades[stat]++;
                 stats.boostStats(stat);
