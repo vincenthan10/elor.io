@@ -83,7 +83,7 @@ export default class Upgrade extends Menu {
         ctx.fillText(`Skill Points: ${this.player.skillPoints}`, this.stX + this.stW - 92, this.stY + 25);
 
         const stats = [
-            { name: "HP", value: this.player.maxHp.toFixed(1), key: "hp" },
+            { name: "HP", value: this.player.damageable.maxHp.toFixed(1), key: "hp" },
             { name: "Strength", value: this.player.strength.toFixed(1), key: "strength" },
             { name: "Body Damage", value: this.player.bodyDamage.toFixed(1), key: "bodyDamage" },
             { name: "Speed", value: this.player.speed.toFixed(1), key: "speed" },
@@ -94,7 +94,7 @@ export default class Upgrade extends Menu {
 
         stats.forEach((stat, i) => {
             const y = startY + i * lineHeight;
-            const cost = getUpgradeCost(stat.key);
+            const cost = this.getUpgradeCost(stat.key);
 
             ctx.fillStyle = "white";
             ctx.fillText(`${stat.name}: ${stat.value}  (Lvl ${this.upgrades[stat.key]}/${this.maxUpgrades[stat.key]})`, this.stX + 10, y);
@@ -124,28 +124,28 @@ export default class Upgrade extends Menu {
 
 
             // Store button hitbox for clicks
-            statButtons[stat.key] = { x: btnX, y: btnY, w: btnW, h: btnH, cost: cost };
+            this.statButtons[stat.key] = { x: btnX, y: btnY, w: btnW, h: btnH, cost: cost };
         });
     }
 
     boostStats(stat) {
         switch (stat) {
             case "hp":
-                let hpPerc = this.player.hp / this.player.maxHp;
-                this.player.maxHp += this.statGains.hp * Math.pow(this.upgradeMultipliers.hp, this.player.upgrades[stat] - 1);
-                this.player.hp = this.player.maxHp * hpPerc;
+                let hpPerc = this.player.damageable.hp / this.player.damageable.maxHp;
+                this.player.damageable.maxHp += this.statGains.hp * Math.pow(this.upgradeMultipliers.hp, this.upgrades[stat] - 1);
+                this.player.damageable.hp = this.player.damageable.maxHp * hpPerc;
                 break;
             case "bodyDamage":
-                this.player.bodyDamage += this.statGains.bodyDamage * Math.pow(this.upgradeMultipliers.bodyDamage, this.player.upgrades[stat] - 1);
+                this.player.bodyDamage += this.statGains.bodyDamage * Math.pow(this.upgradeMultipliers.bodyDamage, this.upgrades[stat] - 1);
                 break;
             case "speed":
-                this.player.speed += this.statGains.speed * Math.pow(this.upgradeMultipliers.speed, this.player.upgrades[stat] - 1);
+                this.player.speed += this.statGains.speed * Math.pow(this.upgradeMultipliers.speed, this.upgrades[stat] - 1);
                 break;
             case "regen":
                 this.player.regenRate *= this.upgradeMultipliers.regen;
                 break;
             case "strength":
-                this.player.strength += this.statGains.strength * Math.pow(this.upgradeMultipliers.strength, this.player.upgrades[stat] - 1);
+                this.player.strength += this.statGains.strength * Math.pow(this.upgradeMultipliers.strength, this.upgrades[stat] - 1);
         }
     }
 }
