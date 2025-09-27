@@ -43,99 +43,32 @@ let fireSpawnInterval = 3000;
 // ???
 let fireShards = [];
 
-// let inventoryOpen = false;
 const inventoryButton = {
-    x: 20,
+    x: 15,
     y: canvas.height - 130,
-    width: 100,
+    width: 105,
     height: 30
 }
 const inv = new Inventory(player, canvas);
-// const invX = 140;
-// const invY = canvas.height - 200;
-// const invW = 210;
-// const invH = 180;
 
-// let statsOpen = false;
 const statsButton = {
-    x: 20,
+    x: 15,
     y: canvas.height - 90,
-    width: 100,
+    width: 105,
     height: 30
 }
 const stats = new Upgrade(player, canvas);
-// const stX = 130;
-// const stY = canvas.height - 220;
-// const stW = 280;
-// const stH = 200;
 
-// let craftOpen = false;
 const craftButton = {
-    x: 20,
+    x: 15,
     y: canvas.height - 50,
-    width: 100,
+    width: 105,
     height: 30
 }
 // const crX = 140;
 // const crY = canvas.height - 200;
 // const crW = 250;
 // const crH = 180;
-
-// object literal
-// player.upgrades = {
-//     hp: 0,
-//     strength: 0,
-//     bodyDamage: 0,
-//     speed: 0,
-//     regen: 0
-// }
-// const baseUpgradeCosts = {
-//     hp: 1,
-//     strength: 2,
-//     bodyDamage: 2,
-//     speed: 1,
-//     regen: 2
-// }
-// const costIncreases = {
-//     hp: 1,
-//     strength: 2,
-//     bodyDamage: 1,
-//     speed: 2,
-//     regen: 2
-// }
-// const statGains = {
-//     hp: 4,
-//     strength: 0.8,
-//     bodyDamage: 0.5,
-//     speed: 0.2,
-//     regen: 0.4
-// }
-// const upgradeMultipliers = {
-//     hp: 1.3,
-//     strength: 1.35,
-//     bodyDamage: 1.6,
-//     speed: 1.3,
-//     regen: 1.58
-// }
-// const maxUpgrades = {
-//     hp: 8,
-//     strength: 6,
-//     bodyDamage: 6,
-//     speed: 5,
-//     regen: 9
-// }
-
-// dictionary, CHANGE TO ARRAY
-// const recipes = {
-//     fireSword: {
-//         name: "Fire Sword",
-//         icon: "fireSword",
-//         output: { item: "fireSword", amount: 1 },
-//         cost: [
-//             { item: "fireShard", amount: 10 }
-//         ]
-//     }
-// };
 
 let gameState = "title";
 // username text cursor
@@ -218,7 +151,6 @@ function update(deltaTime) {
                     takeDamage(enemy.damage, false, true);
                 }
                 enemy.damageable.takeDamage(player.bodyDamage, false, true);
-                //enemy.lastDamageTime = now;
 
             }
         }
@@ -261,21 +193,27 @@ function draw() {
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
         ctx.fillStyle = "white";
-        ctx.font = "48px Arial";
-        ctx.fillText("elor.io", canvas.width / 2 - 100, canvas.height / 2 - 80);
+        ctx.font = "76px Arial";
+        ctx.fillText("elor.io", canvas.width / 2 - 98, canvas.height / 2 - 120);
 
         ctx.font = "24px Arial";
-        ctx.fillText("Enter your username:", canvas.width / 2 - 110, canvas.height / 2 - 20);
+        ctx.fillText("Enter your username:", canvas.width / 2 - 110, canvas.height / 2 - 55);
+
+        ctx.font = "14px Arial";
+        ctx.fillText("Use arrow keys or WASD to move", canvas.width / 2 - 104, canvas.height / 2 + 100);
+        ctx.fillText("Q to toggle between keyboard and mouse movement", canvas.width / 2 - 160, canvas.height / 2 + 120);
+        ctx.fillText("Space or Left Click to attack", canvas.width / 2 - 88, canvas.height / 2 + 140);
+        ctx.fillText("Shift or Right Click to block", canvas.width / 2 - 84, canvas.height / 2 + 160);
 
         ctx.strokeStyle = "white";
-        ctx.strokeRect(canvas.width / 2 - 100, canvas.height / 2 + 10, 200, 40);
+        ctx.strokeRect(canvas.width / 2 - 100, canvas.height / 2 - 30, 200, 35);
 
         ctx.font = "20px Arial";
-        ctx.fillText(usernameInput, canvas.width / 2 - 90, canvas.height / 2 + 37);
+        ctx.fillText(usernameInput, canvas.width / 2 - 90, canvas.height / 2 - 5);
 
         if (cursorVisible) {
             const textX = canvas.width / 2 - 90;
-            const textY = canvas.height / 2 + 37;
+            const textY = canvas.height / 2 - 5;
 
             // Measure the width of the usernameInput text so cursor is positioned right after it
             const textWidth = ctx.measureText(usernameInput).width;
@@ -290,7 +228,7 @@ function draw() {
 
 
         ctx.font = "18px Arial";
-        ctx.fillText("Press Enter to start", canvas.width / 2 - 80, canvas.height / 2 + 80);
+        ctx.fillText("Press Enter to start", canvas.width / 2 - 80, canvas.height / 2 + 40);
         return;
     }
 
@@ -315,7 +253,7 @@ function draw() {
     ctx.strokeRect(inventoryButton.x, inventoryButton.y, inventoryButton.width, inventoryButton.height);
     ctx.fillStyle = "white";
     ctx.font = "16px Arial";
-    ctx.fillText("Inventory", inventoryButton.x + 15, inventoryButton.y + 20);
+    ctx.fillText("Inventory [Z]", inventoryButton.x + 9, inventoryButton.y + 20);
 
     if (inv.isOpen) {
         inv.draw(ctx);
@@ -327,7 +265,7 @@ function draw() {
     ctx.strokeRect(statsButton.x, statsButton.y, statsButton.width, statsButton.height);
     ctx.fillStyle = "white";
     ctx.font = "16px Arial";
-    ctx.fillText("Upgrade", statsButton.x + 17, statsButton.y + 20);
+    ctx.fillText("Upgrade [X]", statsButton.x + 12, statsButton.y + 20);
 
     if (stats.isOpen) {
         stats.draw(ctx);
@@ -339,7 +277,7 @@ function draw() {
     ctx.strokeRect(craftButton.x, craftButton.y, craftButton.width, craftButton.height);
     ctx.fillStyle = "white";
     ctx.font = "16px Arial";
-    ctx.fillText("Crafting", craftButton.x + 19, craftButton.y + 20);
+    ctx.fillText("Crafting [C]", craftButton.x + 14, craftButton.y + 20);
 
     // if (craftOpen) {
     //     drawCrafting(ctx);
@@ -391,138 +329,6 @@ function draw() {
     }
 
 }
-
-// function drawInventory(ctx) {
-//     // Background box
-//     ctx.fillStyle = "#222";
-//     ctx.fillRect(invX, invY, invW, invH);
-//     ctx.strokeStyle = "white";
-//     ctx.strokeRect(invX, invY, invW, invH);
-//     ctx.fillStyle = "white";
-//     ctx.font = "18px Arial";
-//     ctx.fillText("Inventory", invX + 10, invY + 25);
-
-//     ctx.font = "14px Arial";
-//     if (player.fireShards > 0) {
-//         const shardIcon = new FireShard(invX + 10, invY + 40);
-//         shardIcon.drawIcon(ctx, invX + 15, invY + 49);
-//         ctx.fillStyle = "white";
-//         ctx.fillText(`Fire Shards x ${player.fireShards}`, invX + 35, invY + 52);
-//     } else {
-//         ctx.fillStyle = "white";
-//         ctx.fillText("Empty", invX + 20, invY + 52);
-//     }
-// }
-
-// function drawStats(ctx) {
-
-//     // Background
-//     ctx.fillStyle = "rgba(0, 0, 0, 0.8)";
-//     ctx.fillRect(stX, stY, stW, stH);
-//     ctx.strokeStyle = "white";
-//     ctx.strokeRect(stX, stY, stW, stH);
-
-//     ctx.fillStyle = "white";
-//     ctx.font = "18px Arial";
-//     ctx.fillText("Stats Menu", stX + 10, stY + 30);
-
-//     ctx.font = "14px Arial";
-//     // Skill points in top right
-//     ctx.fillText(`Skill Points: ${player.skillPoints}`, stX + stW - 92, stY + 25);
-
-//     const stats = [
-//         { name: "HP", value: player.maxHp.toFixed(1), key: "hp" },
-//         { name: "Strength", value: player.strength.toFixed(1), key: "strength" },
-//         { name: "Body Damage", value: player.bodyDamage.toFixed(1), key: "bodyDamage" },
-//         { name: "Speed", value: player.speed.toFixed(1), key: "speed" },
-//         { name: "Regen", value: (player.regenRate * 1000).toFixed(3) + "/s", key: "regen" }
-//     ];
-//     const startY = stY + 60;
-//     const lineHeight = 30;
-
-//     stats.forEach((stat, i) => {
-//         const y = startY + i * lineHeight;
-//         const cost = getUpgradeCost(stat.key);
-
-//         ctx.fillStyle = "white";
-//         ctx.fillText(`${stat.name}: ${stat.value}  (Lvl ${player.upgrades[stat.key]}/${maxUpgrades[stat.key]})`, stX + 10, y);
-
-//         // Draw upgrade button
-//         const btnX = stX + stW - 90;
-//         const btnY = y - 14;
-//         const btnW = 80;
-//         const btnH = 20;
-
-//         const isMax = player.upgrades[stat.key] >= maxUpgrades[stat.key];
-
-//         // Button color (green if affordable and not maxed, else gray)
-//         ctx.fillStyle = (!isMax && player.skillPoints >= cost) ? "green" : "gray";
-//         ctx.fillRect(btnX, btnY, btnW, btnH);
-//         ctx.strokeStyle = "white";
-//         ctx.strokeRect(btnX, btnY, btnW, btnH);
-
-//         // Text
-//         ctx.fillStyle = "white";
-//         ctx.font = "12px Arial";
-//         if (isMax) {
-//             ctx.fillText("MAX", btnX + 25, btnY + 14);
-//         } else {
-//             ctx.fillText(`+ (${cost})`, btnX + 25, btnY + 14);
-//         }
-
-
-//         // Store button hitbox for clicks
-//         statButtons[stat.key] = { x: btnX, y: btnY, w: btnW, h: btnH, cost: cost };
-//     });
-// }
-
-// let statButtons = {};
-
-// function drawCrafting(ctx) {
-//     // Background box
-//     ctx.fillStyle = "#222";
-//     ctx.fillRect(crX, crY, crW, crH);
-//     ctx.strokeStyle = "white";
-//     ctx.strokeRect(crX, crY, crW, crH);
-//     ctx.fillStyle = "white";
-//     ctx.font = "18px Arial";
-//     ctx.fillText("Crafting", crX + 15, crY + 25);
-
-//     let y = 55;
-//     for (let key in recipes) {
-//         const recipe = recipes[key];
-//         if (!canSeeRecipe(recipe)) continue;
-
-
-//     }
-// }
-
-// function canSeeRecipe(recipe) {
-//     return recipe.cost.some(req => player.inventory[req.item] >= 1);
-// }
-
-// // Calculate cost based on current level
-// function getUpgradeCost(stat) {
-//     return baseUpgradeCosts[stat] + costIncreases[stat] * player.upgrades[stat];
-// }
-
-// function isCollidingWithWall(x, y) {
-//     for (const wall of walls) {
-//         // Find closest point on rectangle to the circle
-//         const closestX = Math.max(wall.x, Math.min(x, wall.x + wall.width));
-//         const closestY = Math.max(wall.y, Math.min(y, wall.y + wall.height));
-
-//         // Find distance between circle center and that point
-//         const dx = x - closestX;
-//         const dy = y - closestY;
-
-//         if (dx * dx + dy * dy < player.radius * player.radius) {
-//             return true;
-//         }
-//     }
-//     return false;
-// }
-
 
 // maybe reorganize later?
 function checkSwordHits() {
@@ -806,25 +612,6 @@ document.addEventListener("click", (e) => {
                 player.skillPoints -= btn.cost;
                 stats.upgrades[stat]++;
                 stats.boostStats(stat);
-                // // Apply upgrade effect
-                // switch (stat) {
-                //     case "hp":
-                //         let hpPerc = player.hp / player.maxHp;
-                //         player.maxHp += statGains.hp * Math.pow(upgradeMultipliers.hp, player.upgrades[stat] - 1);
-                //         player.hp = player.maxHp * hpPerc;
-                //         break;
-                //     case "bodyDamage":
-                //         player.bodyDamage += statGains.bodyDamage * Math.pow(upgradeMultipliers.bodyDamage, player.upgrades[stat] - 1);
-                //         break;
-                //     case "speed":
-                //         player.speed += statGains.speed * Math.pow(upgradeMultipliers.speed, player.upgrades[stat] - 1);
-                //         break;
-                //     case "regen":
-                //         player.regenRate *= upgradeMultipliers.regen;
-                //         break;
-                //     case "strength":
-                //         player.strength += statGains.strength * Math.pow(upgradeMultipliers.strength, player.upgrades[stat] - 1);
-                // }
             }
         }
     }
