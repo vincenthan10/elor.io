@@ -1,7 +1,7 @@
 export const CraftingRegistry = {
     fireSword: {
         name: "Fire Sword",
-        requires: { "Fire Shard": 15 },
-        produces: { "Fire Sword": 1 }
+        requires: { fireShard: 10 },
+        produces: { fireSword: 1 }
     }
 };
