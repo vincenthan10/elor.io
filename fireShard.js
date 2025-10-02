@@ -1,7 +1,7 @@
 import Collectible from "./collectible.js";
 export default class FireShard extends Collectible {
     constructor(x, y, amount = 1, interactable = true) {
-        super(x, y, amount, interactable, "Fire Shard");
+        super(x, y, amount, interactable, "fireShard");
         this.width = 16;
         this.height = 20;
         // Store consistent irregular corners
