@@ -1,6 +1,6 @@
 import Collectible from "./collectible.js";
 export default class Shield extends Collectible {
-    constructor(equipped = true, blockDuration = 750, blockCooldown = 1500, width = 22, height = 25, tipHeight = 10, key = "Basic Shield") {
+    constructor(equipped = true, blockDuration = 750, blockCooldown = 1500, width = 22, height = 25, tipHeight = 10, key = "basicShield") {
         super(0, 0, 1, false, key);
         this.equipped = equipped;
         this.blockDuration = blockDuration;
