@@ -92,7 +92,7 @@ export default class Inventory extends Menu {
             ctx.font = "9px Arial";
             ctx.textAlign = "center";
             ctx.textBaseline = "bottom";
-            ctx.fillText(key, x + this.cellSize / 2, y + this.cellSize - 2);
+            ctx.fillText(ItemClass ? ItemClass.name : ItemClass, x + this.cellSize / 2, y + this.cellSize - 2);
 
             // Advance grid position
             col++;
