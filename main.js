@@ -3,6 +3,7 @@ import FirePatch from "./firePatch.js";
 import FireShard from "./fireShard.js";
 import Inventory from "./inventory.js";
 import Upgrade from "./upgrade.js";
+import Crafting from "./crafting.js";
 
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
@@ -65,10 +66,8 @@ const craftButton = {
     width: 105,
     height: 30
 }
-// const crX = 140;
-// const crY = canvas.height - 200;
-// const crW = 250;
-// const crH = 180;
+
+const craft = new Crafting(player, inv, canvas);
 
 let gameState = "title";
 // username text cursor
@@ -279,9 +278,9 @@ function draw() {
     ctx.font = "16px Arial";
     ctx.fillText("Crafting [C]", craftButton.x + 14, craftButton.y + 20);
 
-    // if (craftOpen) {
-    //     drawCrafting(ctx);
-    // }
+    if (craft.isOpen) {
+        craft.draw(ctx);
+    }
 
     // HP bar
     ctx.fillStyle = "red";
@@ -491,15 +490,17 @@ document.addEventListener("keydown", (e) => {
     if (e.key == "z") {
         inv.isOpen = !inv.isOpen;
         stats.close();
+        craft.close();
     }
     if (e.key == "x") {
         stats.isOpen = !stats.isOpen;
         inv.close();
+        craft.close();
     }
     if (e.key == "c") {
-        // craftOpen = ;
-        // inventoryOpen = false;
-        // statsOpen = false;
+        craft.isOpen = !craft.isOpen;
+        inv.close();
+        stats.close();
     }
     if (e.code == "Space") {
         mouseLeft = true;
@@ -546,13 +547,16 @@ canvas.addEventListener("mousedown", (e) => {
             } else if (stats.isOpen && !(mouseX >= stats.stX && mouseX <= stats.stX + stats.stW && mouseY >= stats.stY && mouseY <= stats.stY + stats.stH)) {
                 stats.close();
                 return;
-            } else if (!inv.isOpen && !stats.isOpen) {
+            } else if (craft.isOpen && !(mouseX >= craft.crX && mouseX <= craft.crX + craft.crW && mouseY >= craft.crY && mouseY <= craft.crY + craft.crH)) {
+                craft.close();
+                return;
+            } else if (!inv.isOpen && !stats.isOpen && !craft.isOpen) {
                 mouseLeft = true;
             }
         }
     }
 
-    if (e.button === 2 && !gameOver && !inv.isOpen && !stats.isOpen) {
+    if (e.button === 2 && !gameOver && !inv.isOpen && !stats.isOpen && !craft.isOpen) {
         mouseRight = true;
     }
 
@@ -613,6 +617,14 @@ document.addEventListener("click", (e) => {
                 stats.upgrades[stat]++;
                 stats.boostStats(stat);
             }
+        }
+    }
+
+    for (let craftin in craft.recipeButtons) {
+        const btn = craft.recipeButtons[craftin];
+        if (mouseX >= btn.x && mouseX <= btn.x + btn.w &&
+            mouseY >= btn.y && mouseY <= btn.y + btn.h) {
+            craft.craft(btn.recipe);
         }
     }
 })
