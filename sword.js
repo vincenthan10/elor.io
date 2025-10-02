@@ -1,6 +1,6 @@
 import Collectible from "./collectible.js";
 export default class Sword extends Collectible {
-    constructor(equipped = true, damage = 3, duration = 250, cooldown = 500, length = 30, width = 12, key = "Basic Sword") {
+    constructor(equipped = true, damage = 3, duration = 250, cooldown = 500, length = 30, width = 12, key = "basicSword") {
         super(0, 0, 1, false, key);
         this.equipped = equipped;
         this.damage = damage;
