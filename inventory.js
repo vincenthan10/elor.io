@@ -19,6 +19,7 @@ export default class Inventory extends Menu {
         this.cellSize = 50;
         this.cols = 4;
         this.padding = 10; // spacing between cells
+        this.cells = {};
     }
 
     open() {
@@ -99,6 +100,10 @@ export default class Inventory extends Menu {
             if (col >= this.cols) {
                 col = 0;
                 row++;
+            }
+
+            if (key.toLowerCase().includes("sword")) {
+                this.cells[key] = { x, y, w: this.cellSize, h: this.cellSize, key };
             }
         }
         ctx.lineWidth = 4;
