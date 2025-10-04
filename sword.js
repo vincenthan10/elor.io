@@ -12,6 +12,7 @@ export default class Sword extends Collectible {
         this.isSwinging = false;
         this.swingTimer = 0;
         this.swingAngleOffset = 0;
+        this.key = key;
     }
 
     swing(deltaTime) {
@@ -61,7 +62,9 @@ export default class Sword extends Collectible {
         const base2Y = baseY - offsetY;
 
         // draw triangle
-        ctx.fillStyle = "silver";
+        let color = "silver";
+        if (this.key === "fireSword") color = "#fe4d13ff";
+        ctx.fillStyle = color;
         ctx.beginPath();
         ctx.moveTo(tipX - camera.x, tipY - camera.y);
         ctx.lineTo(base1X - camera.x, base1Y - camera.y);
@@ -70,17 +73,20 @@ export default class Sword extends Collectible {
         ctx.fill();
     }
 
-    static drawIcon(ctx, x, y, scale = 1) {
+    static drawIcon(ctx, x, y, scale = 1, type = "basic") {
         ctx.save();
         ctx.translate(x, y);
         ctx.scale(scale, scale);
 
-        ctx.fillStyle = "silver";
+        let color = "silver";
+        if (type === "fire") color = "#fe4d13ff";
+        ctx.fillStyle = color;
         ctx.beginPath();
-        ctx.moveTo(-4, -4);
-        ctx.lineTo(0, 4);
-        ctx.lineTo(4, -4);
+        ctx.moveTo(-4, -3);
+        ctx.lineTo(2, 16);
+        ctx.lineTo(8, -3);
         ctx.closePath();
         ctx.fill();
+        ctx.restore();
     }
 }
