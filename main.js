@@ -4,6 +4,7 @@ import FireShard from "./fireShard.js";
 import Inventory from "./inventory.js";
 import Upgrade from "./upgrade.js";
 import Crafting from "./crafting.js";
+import { ItemRegistry } from "./itemRegistry.js";
 
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
@@ -130,7 +131,7 @@ function update(deltaTime) {
                 const offsetX = (Math.random() - 0.5) * 20;
                 const offsetY = (Math.random() - 0.5) * 20;
                 fireShards.push(new FireShard(enemy.x + offsetX, enemy.y + offsetY));
-                player.addXP(10);
+                player.addXP(2);
             }
             player.addXP(enemy.xp);
             enemies.splice(i, 1);
@@ -606,27 +607,62 @@ document.addEventListener("click", (e) => {
     const mouseX = e.clientX - rect.left;
     const mouseY = e.clientY - rect.top;
 
-    for (let stat in stats.statButtons) {
-        const btn = stats.statButtons[stat];
-        if (
-            mouseX >= btn.x && mouseX <= btn.x + btn.w &&
-            mouseY >= btn.y && mouseY <= btn.y + btn.h
-        ) {
-            if (player.skillPoints >= btn.cost && stats.upgrades[stat] < 9) {
-                player.skillPoints -= btn.cost;
-                stats.upgrades[stat]++;
-                stats.boostStats(stat);
+    if (inv.isOpen) {
+        for (let item in inv.cells) {
+            const btn = inv.cells[item];
+            if (
+                mouseX >= btn.x && mouseX <= btn.x + btn.w &&
+                mouseY >= btn.y && mouseY <= btn.y + btn.h
+            ) {
+                // Equip sword
+                const swordAmount = inv.items[item]?.amount || 0;
+                if (swordAmount > 0) {
+                    inv.items[item].amount -= 1;
+                    if (inv.items[item].amount <= 0) delete inv.items[item];
+
+                    const oldSword = player.sword;
+                    if (oldSword) inv.addItem(oldSword.key, 1);
+
+                    const swordInfo = ItemRegistry[item];
+                    console.log(oldSword.key);
+                    if (swordInfo) {
+                        const SwordClass = swordInfo.class;
+                        const sword = new SwordClass(true, swordInfo.params.damage, swordInfo.params.duration, swordInfo.params.cooldown, swordInfo.params.length, swordInfo.params.width, swordInfo.params.key);
+
+                        player.sword = sword;
+                    }
+                    console.log(player.sword.key + ", " + player.damage);
+                }
             }
         }
     }
 
-    for (let craftin in craft.recipeButtons) {
-        const btn = craft.recipeButtons[craftin];
-        if (mouseX >= btn.x && mouseX <= btn.x + btn.w &&
-            mouseY >= btn.y && mouseY <= btn.y + btn.h) {
-            craft.craft(btn.recipe);
+    if (stats.isOpen) {
+        for (let stat in stats.statButtons) {
+            const btn = stats.statButtons[stat];
+            if (
+                mouseX >= btn.x && mouseX <= btn.x + btn.w &&
+                mouseY >= btn.y && mouseY <= btn.y + btn.h
+            ) {
+                if (player.skillPoints >= btn.cost && stats.upgrades[stat] < 9) {
+                    player.skillPoints -= btn.cost;
+                    stats.upgrades[stat]++;
+                    stats.boostStats(stat);
+                }
+            }
         }
     }
+
+    if (craft.isOpen) {
+        for (let craftin in craft.recipeButtons) {
+            const btn = craft.recipeButtons[craftin];
+            if (mouseX >= btn.x && mouseX <= btn.x + btn.w &&
+                mouseY >= btn.y && mouseY <= btn.y + btn.h) {
+                craft.craft(btn.recipe);
+            }
+        }
+    }
+
 })
 
 canvas.addEventListener("contextmenu", (e) => {
