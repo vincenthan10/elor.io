@@ -11,12 +11,12 @@ export default class Player extends Entity {
         this.aimAngle = 0;
         this.level = 1;
         this.xp = 0;
-        this.xpNeeded = 5;
+        this.xpNeeded = 10;
         this.bodyDamage = 1;
         this.strength = 2;
         this.regenUnlocked = false;
         this.regenRate = 0;
-        this.XP_GROWTH_RATE = 1.05;
+        this.XP_GROWTH_RATE = 1.15;
         this.HP_GROWTH_RATE = 1.03;
         this.BODY_DAMAGE_GROWTH_RATE = 1.02;
         this.STRENGTH_GROWTH_RATE = 1.025;
