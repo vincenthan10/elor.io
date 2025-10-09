@@ -613,8 +613,9 @@ document.addEventListener("click", (e) => {
             if (
                 mouseX >= btn.x && mouseX <= btn.x + btn.w &&
                 mouseY >= btn.y && mouseY <= btn.y + btn.h
-            ) {
+            ) if (item.toLowerCase().includes("sword")) {
                 // Equip sword
+                console.log(item);
                 const swordAmount = inv.items[item]?.amount || 0;
                 if (swordAmount > 0) {
                     inv.items[item].amount -= 1;
@@ -624,14 +625,34 @@ document.addEventListener("click", (e) => {
                     if (oldSword) inv.addItem(oldSword.key, 1);
 
                     const swordInfo = ItemRegistry[item];
-                    console.log(oldSword.key);
+                    // console.log(oldSword.key);
                     if (swordInfo) {
                         const SwordClass = swordInfo.class;
                         const sword = new SwordClass(true, swordInfo.params.damage, swordInfo.params.duration, swordInfo.params.cooldown, swordInfo.params.length, swordInfo.params.width, swordInfo.params.key);
 
                         player.sword = sword;
                     }
-                    console.log(player.sword.key + ", " + player.damage);
+                    // console.log(player.sword.key + ", " + player.damage);
+                }
+            } else if (item.toLowerCase().includes("shield")) {
+                console.log(item);
+                // Equip shield
+                const shieldAmount = inv.items[item]?.amount || 0;
+                if (shieldAmount > 0) {
+                    inv.items[item].amount -= 1;
+                    if (inv.items[item].amount <= 0) delete inv.items[item];
+
+                    const oldShield = player.shield;
+                    if (oldShield) inv.addItem(oldShield.key, 1);
+
+                    const shieldInfo = ItemRegistry[item];
+                    // console.log(oldShield.key);
+                    if (shieldInfo) {
+                        const ShieldClass = shieldInfo.class;
+                        const shield = new ShieldClass(true, shieldInfo.params.blockDuration, shieldInfo.params.blockCooldown, shieldInfo.params.width, shieldInfo.params.height, shieldInfo.params.tipHeight, shieldInfo.params.key);
+                        player.shield = shield;
+                    }
+                    // console.log(player.shield);
                 }
             }
         }
