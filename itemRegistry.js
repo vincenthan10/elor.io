@@ -24,7 +24,15 @@ export const ItemRegistry = {
     basicShield: {
         class: Shield,
         name: "Basic Shield",
-        drawIcon: Shield.drawIcon
+        params: {
+            blockDuration: 750,
+            blockCooldown: 1500,
+            width: 22,
+            height: 25,
+            tipHeight: 10,
+            key: "basicShield"
+        },
+        drawIcon: (ctx, x, y, scale) => Shield.drawIcon(ctx, x, y, scale, "basic")
     },
     fireSword: {
         class: Sword,
@@ -38,5 +46,18 @@ export const ItemRegistry = {
             key: "fireSword"
         },
         drawIcon: (ctx, x, y, scale) => Sword.drawIcon(ctx, x, y, scale, "fire")
+    },
+    redShield: {
+        class: Shield,
+        name: "Red Shield",
+        params: {
+            blockDuration: 750,
+            blockCooldown: 750,
+            width: 22,
+            height: 25,
+            tipHeight: 10,
+            key: "redShield"
+        },
+        drawIcon: (ctx, x, y, scale) => Shield.drawIcon(ctx, x, y, scale, "red")
     }
 }
