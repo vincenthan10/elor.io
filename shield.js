@@ -46,7 +46,11 @@ export default class Shield extends Collectible {
         const shieldCenterX = player.x + Math.cos(offsetAngle) * offsetDistance;
         const shieldCenterY = player.y + Math.sin(offsetAngle) * offsetDistance;
 
-        ctx.fillStyle = isBlocking ? "#88ffff" : "#88aaff";
+        if (this.key == "redShield") {
+            ctx.fillStyle = isBlocking ? "#fe2313ff" : "#fe0000ff";
+        } else {
+            ctx.fillStyle = isBlocking ? "#88ffff" : "#88aaff";
+        }
         ctx.save();
         ctx.translate(shieldCenterX - camera.x, shieldCenterY - camera.y);
         ctx.rotate(player.aimAngle);
@@ -67,12 +71,14 @@ export default class Shield extends Collectible {
         ctx.restore();
     }
 
-    static drawIcon(ctx, x, y, scale = 1) {
+    static drawIcon(ctx, x, y, scale = 1, type = "basic") {
         ctx.save();
         ctx.translate(x, y);
         ctx.scale(scale, scale);
 
-        ctx.fillStyle = "#88ffff";
+        let color = "#88ffff";
+        if (type === "red") color = "#fe2313ff";
+        ctx.fillStyle = "color";
         ctx.beginPath();
         ctx.moveTo(-5, -5);
         ctx.lineTo(5, -5);
@@ -81,5 +87,6 @@ export default class Shield extends Collectible {
         ctx.lineTo(-5, 3);
         ctx.closePath();
         ctx.fill();
+        ctx.restore();
     }
 }
