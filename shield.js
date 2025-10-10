@@ -19,6 +19,7 @@ export default class Shield extends Collectible {
             this.blockTimer += deltaTime;
             if (this.blockTimer >= this.blockDuration) {
                 this.isBlocking = false;
+                this.lastBlockTime = performance.now();
             }
         }
     }
@@ -47,7 +48,7 @@ export default class Shield extends Collectible {
         const shieldCenterY = player.y + Math.sin(offsetAngle) * offsetDistance;
 
         if (this.key == "redShield") {
-            ctx.fillStyle = isBlocking ? "#fe2313ff" : "#fe0000ff";
+            ctx.fillStyle = isBlocking ? "#ff4639ff" : "#fe2313ff";
         } else {
             ctx.fillStyle = isBlocking ? "#88ffff" : "#88aaff";
         }
@@ -78,13 +79,13 @@ export default class Shield extends Collectible {
 
         let color = "#88ffff";
         if (type === "red") color = "#fe2313ff";
-        ctx.fillStyle = "color";
+        ctx.fillStyle = color;
         ctx.beginPath();
-        ctx.moveTo(-5, -5);
-        ctx.lineTo(5, -5);
-        ctx.lineTo(5, 3);
-        ctx.lineTo(0, 5);
-        ctx.lineTo(-5, 3);
+        ctx.moveTo(-6, -6);
+        ctx.lineTo(8, -6);
+        ctx.lineTo(8, 7);
+        ctx.lineTo(1, 11);
+        ctx.lineTo(-6, 7);
         ctx.closePath();
         ctx.fill();
         ctx.restore();
