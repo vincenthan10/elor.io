@@ -28,6 +28,8 @@ export default class Sword extends Collectible {
             if (progress >= 1) {
                 this.isSwinging = false;
                 this.swingAngleOffset = 0;
+                this.timeSinceLastSwing = performance.now();
+
             }
 
         }
