@@ -82,7 +82,6 @@ export default class Player extends Entity {
         if (!this.sword.isSwinging && now - this.sword.timeSinceLastSwing >= this.sword.cooldown) {
             this.sword.isSwinging = true;
             this.sword.swingTimer = 0;
-            this.sword.timeSinceLastSwing = now;
         }
     }
 
@@ -91,7 +90,6 @@ export default class Player extends Entity {
         if (!this.shield.isBlocking && now - this.shield.lastBlockTime >= this.shield.blockCooldown) {
             this.shield.isBlocking = true;
             this.shield.blockTimer = 0;
-            this.shield.lastBlockTime = now;
         }
     }
 
