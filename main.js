@@ -1,5 +1,6 @@
 import Player from "./player.js";
 import FirePatch from "./firePatch.js";
+import ZombieFlame from "./zombieFlame.js";
 import FireShard from "./fireShard.js";
 import Inventory from "./inventory.js";
 import Upgrade from "./upgrade.js";
@@ -446,8 +447,14 @@ function spawnFirePatch() {
         }
 
         // Valid location found
-        enemies.push(new FirePatch(x, y, rarityPicked.key));
-        console.log("spawned", rarityPicked.key, rarityPicked.weight);
+        let n = Math.random();
+        if (n < 0.4) {
+            enemies.push(new FirePatch(x, y, rarityPicked.key));
+            console.log("spawned FirePatch", rarityPicked.key, rarityPicked.weight);
+        } else {
+            enemies.push(new ZombieFlame(x, y, rarityPicked.key));
+            console.log("spawned ZombieFlame", rarityPicked.key, rarityPicked.weight);
+        }
         return;
     }
 }
