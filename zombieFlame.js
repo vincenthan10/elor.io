@@ -14,6 +14,7 @@ export default class ZombieFlame extends Enemy {
 
         this.rarity = rarity;
         this.rarityColor = rarity.color;
+        this.shape = "square";
     }
 
     update(deltaTime) {
@@ -26,21 +27,21 @@ export default class ZombieFlame extends Enemy {
         ctx.save();
         ctx.beginPath();
         ctx.fillStyle = "#a83005ff";
-        ctx.fillRect(this.x - camera.x, this.y - camera.y, this.radius, this.radius);
+        ctx.fillRect(this.x - camera.x - this.radius / 2, this.y - camera.y - this.radius / 2, this.radius, this.radius);
 
         // HP bar
         ctx.fillStyle = "red";
-        ctx.fillRect(this.x - camera.x - this.radius * 0.1, this.y - camera.y + this.radius * 1.25, this.radius * 0.9, this.radius / 5);
+        ctx.fillRect(this.x - camera.x - this.radius * 0.6, this.y - camera.y + this.radius * 0.7, this.radius * 0.8, this.radius / 5);
 
         ctx.fillStyle = "limegreen";
-        ctx.fillRect(this.x - camera.x - this.radius * 0.1, this.y - camera.y + this.radius * 1.25, (this.damageable.hp / this.damageable.maxHp) * (this.radius * 0.9), this.radius / 5);
+        ctx.fillRect(this.x - camera.x - this.radius * 0.6, this.y - camera.y + this.radius * 0.7, (this.damageable.hp / this.damageable.maxHp) * (this.radius * 0.8), this.radius / 5);
 
         // Rarity text to right of bar (color-coded)
         ctx.font = `${Math.round(this.radius / 5 + 3)}px Arial`;
         ctx.textBaseline = "middle";
         ctx.textAlign = "left";
         ctx.fillStyle = this.rarityColor;
-        ctx.fillText(this.rarity.key, this.x - camera.x - this.radius * 0.1 + this.radius * 0.9 + 6, this.y - camera.y + this.radius * 1.25 + this.radius / 5 / 2);
+        ctx.fillText(this.rarity.key, this.x - camera.x - this.radius * 0.6 + this.radius * 0.8 + 6, this.y - camera.y + this.radius * 0.7 + this.radius / 5 / 2);
         ctx.restore();
     }
 }
