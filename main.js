@@ -142,10 +142,8 @@ function update(deltaTime) {
     // Player-enemy collision
     enemies.forEach(enemy => {
         if (enemy.isAlive && !enemy.damageable.isFading) {
-            const dx = player.x - enemy.x;
-            const dy = player.y - enemy.y;
-            const dist = Math.sqrt(dx * dx + dy * dy);
-            if (dist < player.radius + enemy.radius) {
+            enemy.follow(player, deltaTime);
+            if (checkCollision(player, enemy)) {
                 const now = performance.now();
 
                 if (!player.shield.isBlocking) {
@@ -186,6 +184,28 @@ function update(deltaTime) {
         }
     })
     fireShards = fireShards.filter(shard => shard.isAlive);
+}
+
+function checkCollision(player, enemy) {
+    if (enemy.shape === "circle") {
+        const dx = player.x - enemy.x;
+        const dy = player.y - enemy.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        return dist < player.radius + enemy.radius;
+    } else if (enemy.shape === "square") {
+        const halfR = enemy.radius / 2;
+
+        const closestX = Math.max(enemy.x - halfR, Math.min(player.x, enemy.x + halfR));
+        const closestY = Math.max(enemy.y - halfR, Math.min(player.y, enemy.y + halfR));
+
+        const dx = player.x - closestX;
+        const dy = player.y - closestY;
+
+        return (dx * dx + dy * dy) < (player.radius * player.radius);
+    }
+
+    return false;
+
 }
 
 function draw() {
