@@ -22,8 +22,8 @@ export default class Enemy extends Entity {
         const dist = Math.sqrt(dx * dx + dy * dy);
         if (dist === 0) return;
 
-        this.x += (dx / dist) * this.speed * deltaTime / 1000;
-        this.y += (dy / dist) * this.speed * deltaTime / 1000;
+        this.x += (dx / dist) * this.speed * deltaTime / 100;
+        this.y += (dy / dist) * this.speed * deltaTime / 100;
     }
     draw(ctx, camera) {
 
