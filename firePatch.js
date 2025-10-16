@@ -15,7 +15,7 @@ export default class FirePatch extends Enemy {
 
         this.rarity = rarity;
         this.rarityColor = rarity.color;
-
+        this.shape = "circle";
     }
 
     update(deltaTime) {
