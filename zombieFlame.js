@@ -10,7 +10,7 @@ export default class ZombieFlame extends Enemy {
         const baseDamage = 2;
         const baseXp = 4;
 
-        super(x, y, baseRadius, baseHp, 2.5, baseDamage, baseXp, rarityKey);
+        super(x, y, baseRadius, baseHp, 2.5, baseDamage, baseXp, 340, rarityKey);
 
         this.rarity = rarity;
         this.rarityColor = rarity.color;
