@@ -21,6 +21,9 @@ export default class Player extends Entity {
         this.BODY_DAMAGE_GROWTH_RATE = 1.02;
         this.STRENGTH_GROWTH_RATE = 1.025;
         this.skillPoints = 0;
+        this.invincible = true;
+        this.invincTimer = 0;
+        this.invincTime = 2000;
 
         // Sword 
         this.sword = new Sword();
@@ -94,6 +97,15 @@ export default class Player extends Entity {
     }
 
     update(deltaTime, keysPressed, camera, mapWidth, mapHeight, walls, canvas) {
+        if (this.invincible) {
+            console.log("invincible");
+            this.invincTimer += deltaTime;
+            if (this.invincTimer >= this.invincTime) {
+                this.invincible = false;
+                this.invincTimer = 0;
+            }
+        }
+
         // Movement and boundaries
         //keyboard movement
         if (!this.damageable.isFading) {
@@ -159,22 +171,7 @@ export default class Player extends Entity {
 
     }
 
-    isCollidingWithWall(x, y, walls) {
-        for (const wall of walls) {
-            // Find closest point on rectangle to the circle
-            const closestX = Math.max(wall.x, Math.min(x, wall.x + wall.width));
-            const closestY = Math.max(wall.y, Math.min(y, wall.y + wall.height));
 
-            // Find distance between circle center and that point
-            const dx = x - closestX;
-            const dy = y - closestY;
-
-            if (dx * dx + dy * dy < this.radius * this.radius) {
-                return true;
-            }
-        }
-        return false;
-    }
 
 
     draw(ctx, camera) {
