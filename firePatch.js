@@ -11,7 +11,7 @@ export default class FirePatch extends Enemy {
         const baseDamage = 4;
         const baseXp = 3;
 
-        super(x, y, baseRadius, baseHp, 0, baseDamage, baseXp, rarityKey);
+        super(x, y, baseRadius, baseHp, 0, baseDamage, baseXp, 0, rarityKey);
 
         this.rarity = rarity;
         this.rarityColor = rarity.color;
