@@ -22,14 +22,14 @@ let mouseRight = false;
 
 // array - this is for enemy stat changes for different rarities
 export const rarityTable = [
-    { key: "Common", weight: 50, sizeMult: 1.0, hpMult: 1.0, dmgMult: 1.0, xpMult: 1.0, drops: 1, color: "#4fbe53ff" },
-    { key: "Unusual", weight: 25, sizeMult: 1.2, hpMult: 1.8, dmgMult: 1.6, xpMult: 2.0, drops: 1, color: "#f1de37ff" }, // 2.1, 1.9
-    { key: "Rare", weight: 13, sizeMult: 1.4, hpMult: 4, dmgMult: 3, xpMult: 4.1, drops: 1, color: "#2c1bc6ff" }, // 4.6, 3.6
-    { key: "Epic", weight: 6.5, sizeMult: 1.7, hpMult: 8.2, dmgMult: 4.8, xpMult: 9.4, drops: 2, color: "#720bf0ff" }, // 11.9, 7
-    { key: "Legendary", weight: 3, sizeMult: 2.5, hpMult: 20, dmgMult: 9, xpMult: 24.2, drops: 4, color: "#d5502bff" }, // 35, 13.5
-    { key: "Mythic", weight: 1.5, sizeMult: 4, hpMult: 60, dmgMult: 16, xpMult: 73, drops: 7, color: "#04d3daff" }, // 120, 26
-    { key: "Fabled", weight: 0.7, sizeMult: 6.5, hpMult: 200, dmgMult: 30, xpMult: 275, drops: 14, color: "#ff13a4ff" }, // 500, 60
-    { key: "Supreme", weight: 0.3, sizeMult: 10, hpMult: 1200, dmgMult: 60, xpMult: 1583, drops: 50, color: "#666666" } // 3000, 125
+    { key: "Common", weight: 50, sizeMult: 1.0, hpMult: 1.0, dmgMult: 1.0, xpMult: 1.0, drops: 1, aggro: 1, color: "#4fbe53ff" },
+    { key: "Unusual", weight: 25, sizeMult: 1.2, hpMult: 1.8, dmgMult: 1.6, xpMult: 2.0, drops: 1, aggro: 1.1, color: "#f1de37ff" }, // 2.1, 1.9
+    { key: "Rare", weight: 13, sizeMult: 1.4, hpMult: 4, dmgMult: 3, xpMult: 4.1, drops: 1, aggro: 1.3, color: "#2c1bc6ff" }, // 4.6, 3.6
+    { key: "Epic", weight: 6.5, sizeMult: 1.7, hpMult: 8.2, dmgMult: 4.8, xpMult: 9.4, drops: 2, aggro: 1.6, color: "#720bf0ff" }, // 11.9, 7
+    { key: "Legendary", weight: 3, sizeMult: 2.5, hpMult: 20, dmgMult: 9, xpMult: 24.2, drops: 4, aggro: 2, color: "#d5502bff" }, // 35, 13.5
+    { key: "Mythic", weight: 1.5, sizeMult: 4, hpMult: 60, dmgMult: 16, xpMult: 73, drops: 7, aggro: 2.5, color: "#04d3daff" }, // 120, 26
+    { key: "Fabled", weight: 0.7, sizeMult: 6.5, hpMult: 200, dmgMult: 30, xpMult: 275, drops: 14, aggro: 3.1, color: "#ff13a4ff" }, // 500, 60
+    { key: "Supreme", weight: 0.3, sizeMult: 10, hpMult: 1200, dmgMult: 60, xpMult: 1583, drops: 50, aggro: 3.8, color: "#666666" } // 3000, 125
 ]
 
 const enemies = [
@@ -142,7 +142,7 @@ function update(deltaTime) {
     // Player-enemy collision
     enemies.forEach(enemy => {
         if (enemy.isAlive && !enemy.damageable.isFading) {
-            enemy.follow(player, deltaTime);
+            if (enemy.speed > 0 && enemy.distanceTo(player) <= enemy.aggro) enemy.follow(player, deltaTime);
             if (checkCollision(player, enemy)) {
                 const now = performance.now();
 
@@ -480,7 +480,10 @@ function spawnFirePatch() {
 }
 
 function takeDamage(amount) {
-    player.damageable.takeDamage(amount, false, true);
+    if (!player.invincible) {
+        player.damageable.takeDamage(amount, false, true);
+
+    }
     if (!player.isAlive) {
         gameOver = true;
     }
@@ -506,6 +509,7 @@ document.addEventListener("keydown", (e) => {
         } else if (e.key === "Enter") {
             username = usernameInput.trim() || "Unknown";
             gameState = "playing";
+            player.invincible = true;
         } else if (e.key.length === 1 && usernameInput.length < 15) {
             usernameInput += e.key;
             e.preventDefault();
@@ -536,6 +540,7 @@ document.addEventListener("keydown", (e) => {
     if (e.code == "ShiftLeft" || e.code == "ShiftRight") mouseRight = true;
     if (e.code == "Enter" && gameOver) {
         player.isAlive = true;
+        player.invincible = true;
         player.x = playerSpawnX;
         player.y = playerSpawnY;
         player.damageable.hp = player.damageable.maxHp;
@@ -593,6 +598,7 @@ canvas.addEventListener("mousedown", (e) => {
 document.addEventListener("mousedown", (e) => {
     if (e.button === 0 && gameOver) {
         player.isAlive = true;
+        player.invincible = true;
         player.damageable.hp = player.damageable.maxHp;
         player.x = playerSpawnX;
         player.y = playerSpawnY;
