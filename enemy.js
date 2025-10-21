@@ -17,14 +17,18 @@ export default class Enemy extends Entity {
     update(deltaTime) {
         this.damageable.update(deltaTime);
     }
-    follow(target, deltaTime) {
+    follow(target, deltaTime, walls) {
+        // Need to change when adding more enemies - only follow when wall isn't in the way, for now it's fine because Zombies see through walls (I'm lazy)
         const dx = target.x - this.x;
         const dy = target.y - this.y;
         const dist = Math.sqrt(dx * dx + dy * dy);
         if (dist === 0) return;
 
-        this.x += (dx / dist) * this.speed * deltaTime / 100;
-        this.y += (dy / dist) * this.speed * deltaTime / 100;
+        let newX = this.x + (dx / dist) * this.speed * deltaTime / 100;
+        let newY = this.y + (dy / dist) * this.speed * deltaTime / 100;
+        if (!this.isCollidingWithWall(newX, this.y, walls)) this.x = newX;
+        if (!this.isCollidingWithWall(this.x, newY, walls)) this.y = newY;
+
     }
     draw(ctx, camera) {
 
