@@ -14,8 +14,8 @@ const mapWidth = 2500;
 const mapHeight = 1250;
 
 const player = new Player(400, 300);
-const playerSpawnX = 400;
-const playerSpawnY = 300;
+let playerSpawnX = 400;
+let playerSpawnY = 300;
 
 let mouseLeft = false;
 let mouseRight = false;
@@ -142,7 +142,7 @@ function update(deltaTime) {
     // Player-enemy collision
     enemies.forEach(enemy => {
         if (enemy.isAlive && !enemy.damageable.isFading) {
-            if (enemy.speed > 0 && enemy.distanceTo(player) <= enemy.aggro) enemy.follow(player, deltaTime);
+            if (enemy.speed > 0 && enemy.distanceTo(player) <= enemy.aggro) enemy.follow(player, deltaTime, walls);
             if (checkCollision(player, enemy)) {
                 const now = performance.now();
 
@@ -490,6 +490,38 @@ function takeDamage(amount) {
     // console.log(`Player HP: ${player.hp}/${player.maxHp}`);
 }
 
+function resetPlayer() {
+    player.isAlive = true;
+    player.invincible = true;
+    player.damageable.hp = player.damageable.maxHp;
+    let tries = 0;
+    while (tries < 10) {
+        const x = Math.random() * (250) + 350;
+        const y = Math.random() * (180) + 210;
+        // Avoid spawning on top of another enemy
+        let tooCloseToEnemy = false;
+        for (const enemy of enemies) {
+            const distToEnemy = Math.hypot(x - enemy.x, y - enemy.y);
+            if (distToEnemy < enemy.radius * 3) {
+                tooCloseToEnemy = true;
+            }
+        }
+        if (tooCloseToEnemy) {
+            tries++;
+            continue;
+        }
+        // Valid location found
+        playerSpawnX = x;
+        playerSpawnY = y;
+        break;
+    }
+    player.x = playerSpawnX;
+    player.y = playerSpawnY;
+    console.log(player.x + ", " + player.y);
+    player.damageable.fadeTime = 1;
+    gameOver = false;
+}
+
 
 let lastTimestamp = 0;
 function gameLoop(timestamp) {
@@ -539,13 +571,7 @@ document.addEventListener("keydown", (e) => {
     }
     if (e.code == "ShiftLeft" || e.code == "ShiftRight") mouseRight = true;
     if (e.code == "Enter" && gameOver) {
-        player.isAlive = true;
-        player.invincible = true;
-        player.x = playerSpawnX;
-        player.y = playerSpawnY;
-        player.damageable.hp = player.damageable.maxHp;
-        player.damageable.fadeTime = 1;
-        gameOver = false;
+        resetPlayer();
     }
 
 
@@ -597,13 +623,7 @@ canvas.addEventListener("mousedown", (e) => {
 
 document.addEventListener("mousedown", (e) => {
     if (e.button === 0 && gameOver) {
-        player.isAlive = true;
-        player.invincible = true;
-        player.damageable.hp = player.damageable.maxHp;
-        player.x = playerSpawnX;
-        player.y = playerSpawnY;
-        player.damageable.fadeTime = 1;
-        gameOver = false;
+        resetPlayer();
     }
 })
 
