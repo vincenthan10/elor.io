@@ -1,5 +1,6 @@
 import Enemy from "./enemy.js";
 import { rarityTable } from "./main.js";
+// Zombies can see through walls but can't pass through them
 export default class ZombieFlame extends Enemy {
 
     constructor(x, y, rarityKey = null) {
