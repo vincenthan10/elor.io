@@ -171,9 +171,6 @@ export default class Player extends Entity {
 
     }
 
-
-
-
     draw(ctx, camera) {
         if (!this.isAlive && !this.damageable.isFading) return;
         ctx.save();
