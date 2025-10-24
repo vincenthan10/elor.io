@@ -8,6 +8,7 @@ export default class Player extends Entity {
         super(x, y, 20);
         this.damageable = new Damageable(10, this);
         this.speed = 2.5;
+        this.weight = 1;
         this.aimAngle = 0;
         this.level = 1;
         this.xp = 0;
