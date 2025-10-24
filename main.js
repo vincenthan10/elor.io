@@ -143,6 +143,45 @@ function update(deltaTime) {
     enemies.forEach(enemy => {
         if (enemy.isAlive && !enemy.damageable.isFading) {
             if (enemy.speed > 0 && enemy.distanceTo(player) <= enemy.aggro) enemy.follow(player, deltaTime, walls);
+            // Make enemies not go through each other
+            for (let i = 0; i < enemies.length; i++) {
+                const e1 = enemies[i];
+                if (e1.weight === 0 || !e1.isAlive) continue;
+
+                for (let j = i + 1; j < enemies.length; j++) {
+                    const e2 = enemies[j];
+                    if (e2.weight === 0 || !e1.isAlive) continue;
+
+                    const dx = e2.x - e1.x;
+                    const dy = e2.y - e1.y;
+                    const dist = Math.hypot(dx, dy);
+                    const minDist = e1.radius + e2.radius;
+
+                    if (dist < minDist && dist > 0) {
+                        const force = (minDist - dist) * 0.1;
+                        const nx = dx / dist;
+                        const ny = dy / dist;
+
+                        const new1X = e1.x - nx * force;
+                        const new1Y = e1.y - ny * force;
+                        const new2X = e2.x + nx * force;
+                        const new2Y = e2.y + ny * force;
+
+                        const e1HitsWall = e1.isCollidingWithWall(new1X, new1Y, walls);
+                        const e2HitsWall = e2.isCollidingWithWall(new2X, new2Y, walls);
+
+                        if (!e1HitsWall) {
+                            e1.x = new1X;
+                            e1.y = new1Y;
+                        }
+                        if (!e2HitsWall) {
+                            e2.x = new2X;
+                            e2.y = new2Y;
+                        }
+                    }
+                }
+            }
+
             if (checkCollision(player, enemy)) {
                 const now = performance.now();
 
