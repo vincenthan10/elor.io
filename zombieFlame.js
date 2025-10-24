@@ -6,12 +6,15 @@ export default class ZombieFlame extends Enemy {
     constructor(x, y, rarityKey = null) {
         const rarity = rarityTable.find(r => r.key === rarityKey) || rarityTable[0];
 
+        const name = "ZombieFlame";
         const baseRadius = 24;
         const baseHp = 14;
         const baseDamage = 2;
         const baseXp = 4;
+        const baseAggro = 340;
+        const baseWeight = 2.1;
 
-        super(x, y, baseRadius, baseHp, 2.5, baseDamage, baseXp, 340, rarityKey);
+        super(name, x, y, baseRadius, baseHp, 2.5, baseDamage, baseXp, baseAggro, baseWeight, rarityKey);
 
         this.rarity = rarity;
         this.rarityColor = rarity.color;
