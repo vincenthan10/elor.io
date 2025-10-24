@@ -6,12 +6,15 @@ export default class FirePatch extends Enemy {
 
         const rarity = rarityTable.find(r => r.key === rarityKey) || rarityTable[0];
 
+        const name = "FirePatch";
         const baseRadius = 20;
         const baseHp = 12;
         const baseDamage = 4;
         const baseXp = 3;
+        const baseAggro = 0;
+        const baseWeight = 0;
 
-        super(x, y, baseRadius, baseHp, 0, baseDamage, baseXp, 0, rarityKey);
+        super(name, x, y, baseRadius, baseHp, 0, baseDamage, baseXp, baseAggro, baseWeight, rarityKey);
 
         this.rarity = rarity;
         this.rarityColor = rarity.color;
