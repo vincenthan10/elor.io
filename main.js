@@ -186,9 +186,9 @@ function update(deltaTime) {
                 const now = performance.now();
 
                 if (!player.shield.isBlocking) {
-                    takeDamage(enemy.damage, false, true);
+                    takeDamage(enemy.damage, enemy.id);
                 }
-                enemy.damageable.takeDamage(player.bodyDamage, false, true);
+                enemy.damageable.takeDamage(player.bodyDamage, false, true, "player body");
 
             }
         }
@@ -303,7 +303,10 @@ function draw() {
         ctx.fillRect(wall.x - camera.x, wall.y - camera.y, wall.width, wall.height);
     }
     player.draw(ctx, camera);
-    enemies.forEach(e => e.draw(ctx, camera));
+    enemies
+        .sort((a, b) => a.zIndex - b.zIndex) // sorting function sorts in increasing order
+        // if a-b<0, that means a is drawn before b, so lower zIndex is drawn first. if a-b>0, then swap a and b so that the lower zIndex is drawn first.
+        .forEach(e => e.draw(ctx, camera));
     fireShards.forEach(shard => shard.draw(ctx, camera, performance.now()));
 
     // Inventory button
@@ -415,7 +418,7 @@ function checkSwordHits() {
 
         // Sword hit range: within sword reach & in swing
         if (dist < player.radius + enemy.radius + 40 && angleDiff <= swingArc) {
-            enemy.damageable.takeDamage(player.damage, true, false);
+            enemy.damageable.takeDamage(player.damage, true, false, "player sword");
         }
     })
 }
@@ -518,9 +521,10 @@ function spawnFirePatch() {
     }
 }
 
-function takeDamage(amount) {
+function takeDamage(amount, attacker) {
     if (!player.invincible) {
-        player.damageable.takeDamage(amount, false, true);
+        //console.log(attacker);
+        player.damageable.takeDamage(amount, false, true, attacker);
 
     }
     if (!player.isAlive) {
