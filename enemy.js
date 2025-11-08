@@ -1,3 +1,4 @@
+let enemyIdCounter = 0;
 import Entity from "./entity.js";
 import Damageable from "./damageable.js";
 import { rarityTable } from "./main.js";
@@ -6,6 +7,8 @@ export default class Enemy extends Entity {
         const rarity = rarityTable.find(r => r.key === rarityKey) || rarityTable[0];
         const finalRadius = Math.round(radius * rarity.sizeMult);
         super(x, y, finalRadius);
+        this.id = ++enemyIdCounter;
+        this.zIndex = 0; // for layering
         this.name = name;
         this.rarity = rarity;
         this.rarityColor = rarity.color;
