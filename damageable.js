@@ -6,19 +6,26 @@ export default class Damageable {
         this.fadeTime = 1;
         this.owner = owner;
 
-        this.weaponHitCooldown = 0;
-        this.bodyHitCooldown = 0;
+        this.weaponHitCooldown = new Map();
+        this.bodyHitCooldown = new Map();
     }
 
-    takeDamage(amount, sword, body) {
+    takeDamage(amount, sword, body, attacker = null) {
         if (this.isFading) return;
+
+        const id = attacker ? attacker.id || attacker : "global";
+        //console.log(id);
         if (sword) {
-            if (this.weaponHitCooldown > 0) return;
-            this.weaponHitCooldown = 300;
+            const lastHit = this.weaponHitCooldown.get(id) || 0;
+            const now = performance.now();
+            if (now - lastHit < 300) return;
+            this.weaponHitCooldown.set(id, now);
         }
         if (body) {
-            if (this.bodyHitCooldown > 0) return;
-            this.bodyHitCooldown = 500;
+            const lastHit = this.bodyHitCooldown.get(id) || 0;
+            const now = performance.now();
+            if (now - lastHit < 500) return;
+            this.bodyHitCooldown.set(id, now);
         }
         this.hp -= amount;
         if (this.hp <= 0) {
@@ -48,5 +55,13 @@ export default class Damageable {
         if (this.weaponHitCooldown > 0) {
             this.weaponHitCooldown -= deltaTime;
         }
+        const now = performance.now();
+        for (const [id, t] of this.bodyHitCooldown) {
+            if (now - t > 1000) this.bodyHitCooldown.delete(id);
+        }
+        for (const [id, t] of this.weaponHitCooldown) {
+            if (now - t > 1000) this.weaponHitCooldown.delete(id);
+        }
+
     }
 }
