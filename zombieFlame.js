@@ -19,6 +19,7 @@ export default class ZombieFlame extends Enemy {
         this.rarity = rarity;
         this.rarityColor = rarity.color;
         this.shape = "square";
+        this.zIndex = 5;
     }
 
     update(deltaTime) {
