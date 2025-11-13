@@ -4,15 +4,52 @@ export default class Entity {
         this.y = y;
         this.radius = radius;
         this.isAlive = true;
+
+        this.knockback = { x: 0, y: 0 };
+        this.knockbackDecay = 0.85;
+        this.maxKnockback = 2.0;
     }
 
-    update(deltaTime) {
-
+    update(deltaTime, walls) {
+        this.applyKnockback(deltaTime, walls);
     }
 
     draw(ctx, camera) {
 
     }
+    applyKnockback(deltaTime, walls) {
+        if (this.knockback.x !== 0 || this.knockback.y !== 0) {
+            const kbScale = deltaTime / 16.6667;
+            const kbMoveX = this.knockback.x * kbScale;
+            const kbMoveY = this.knockback.y * kbScale;
+
+            const newX = this.x + kbMoveX;
+            const newY = this.y + kbMoveY;
+
+            if (!this.isCollidingWithWall(newX, this.y, walls)) this.x = newX;
+            if (!this.isCollidingWithWall(this.x, newY, walls)) this.y = newY;
+
+            const decay = Math.pow(this.knockbackDecay, deltaTime / 16.6667);
+            this.knockback.x *= decay;
+            this.knockback.y *= decay;
+
+            if (Math.abs(this.knockback.x) < 0.01) this.knockback.x = 0;
+            if (Math.abs(this.knockback.y) < 0.01) this.knockback.y = 0;
+
+        }
+    }
+
+    addKnockback(nx, ny, strength) {
+        this.knockback.x += nx * strength;
+        this.knockback.y += ny * strength;
+
+        const mag = Math.hypot(this.knockback.x, this.knockback.y);
+        if (mag > this.maxKnockback) {
+            this.knockback.x = (this.knockback.x / mag) * this.maxKnockback;
+            this.knockback.y = (this.knockback.y / mag) * this.maxKnockback;
+        }
+    }
+
     distanceTo(other) {
         const dx = this.x - other.x;
         const dy = this.y - other.y;
