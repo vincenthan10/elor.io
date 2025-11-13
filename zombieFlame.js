@@ -22,8 +22,8 @@ export default class ZombieFlame extends Enemy {
         this.zIndex = 5;
     }
 
-    update(deltaTime) {
-        super.update(deltaTime);
+    update(deltaTime, walls) {
+        super.update(deltaTime, walls);
     }
 
     draw(ctx, camera) {
