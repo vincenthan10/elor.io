@@ -122,7 +122,7 @@ function update(deltaTime) {
     if (mouseRight) {
         player.defend();
     }
-    enemies.forEach(e => e.update(deltaTime));
+    enemies.forEach(e => e.update(deltaTime, walls));
     checkSwordHits();
     // Remove dead enemies
     for (let i = enemies.length - 1; i >= 0; i--) {
@@ -184,6 +184,19 @@ function update(deltaTime) {
 
             if (checkCollision(player, enemy)) {
                 const now = performance.now();
+
+                if (enemy.weight > 0) {
+                    const dx = player.x - enemy.x;
+                    const dy = player.y - enemy.y;
+                    const dist = Math.hypot(dx, dy) || 1;
+                    const nx = dx / dist;
+                    const ny = dy / dist;
+                    const enemyStrength = 0.5 * (enemy.damage || 1) * (enemy.weight || 1);
+                    const playerStrength = 0.03 * (player.damage || 1) * (player.weight || 1);
+                    player.addKnockback(nx, ny, enemyStrength);
+                    enemy.addKnockback(-nx, -ny, playerStrength);
+                }
+
 
                 if (!player.shield.isBlocking) {
                     takeDamage(enemy.damage, enemy.id);
