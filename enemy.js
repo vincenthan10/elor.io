@@ -19,7 +19,8 @@ export default class Enemy extends Entity {
         this.aggro = Math.max(150, Math.round(aggro * rarity.aggro));
         this.weight = weight * rarity.sizeMult;
     }
-    update(deltaTime) {
+    update(deltaTime, walls) {
+        super.update(deltaTime, walls);
         this.damageable.update(deltaTime);
     }
     follow(target, deltaTime, walls) {
