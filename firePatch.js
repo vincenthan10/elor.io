@@ -9,7 +9,7 @@ export default class FirePatch extends Enemy {
         const name = "FirePatch";
         const baseRadius = 20;
         const baseHp = 12;
-        const baseDamage = 4;
+        const baseDamage = 1;
         const baseXp = 3;
         const baseAggro = 0;
         const baseWeight = 0;
@@ -22,8 +22,8 @@ export default class FirePatch extends Enemy {
         this.zIndex = 10;
     }
 
-    update(deltaTime) {
-        super.update(deltaTime);
+    update(deltaTime, walls) {
+        super.update(deltaTime, walls);
     }
 
     draw(ctx, camera) {
