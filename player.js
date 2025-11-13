@@ -98,6 +98,7 @@ export default class Player extends Entity {
     }
 
     update(deltaTime, keysPressed, camera, mapWidth, mapHeight, walls, canvas) {
+        super.update(deltaTime, walls);
         if (this.invincible) {
             console.log("invincible");
             this.invincTimer += deltaTime;
