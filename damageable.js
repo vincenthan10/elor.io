@@ -24,7 +24,7 @@ export default class Damageable {
         if (body) {
             const lastHit = this.bodyHitCooldown.get(id) || 0;
             const now = performance.now();
-            if (now - lastHit < 100) return;
+            if (now - lastHit < 200) return;
             this.bodyHitCooldown.set(id, now);
         }
         this.hp -= amount;
