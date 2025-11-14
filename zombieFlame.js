@@ -49,4 +49,8 @@ export default class ZombieFlame extends Enemy {
         ctx.fillText(this.rarity.key, this.x - camera.x - this.radius * 0.6 + this.radius * 0.8 + 6, this.y - camera.y + this.radius * 0.7 + this.radius / 5 / 2);
         ctx.restore();
     }
+
+    isCollidingWithWall(x, y, walls) {
+        return this.isCollidingWithWallSq(x, y, walls);
+    }
 }
