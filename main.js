@@ -152,31 +152,48 @@ function update(deltaTime) {
                     const e2 = enemies[j];
                     if (e2.weight === 0 || !e1.isAlive) continue;
 
+                    const half1 = e1.radius / 2;
+                    const half2 = e2.radius / 2;
+
                     const dx = e2.x - e1.x;
                     const dy = e2.y - e1.y;
-                    const dist = Math.hypot(dx, dy);
-                    const minDist = e1.radius + e2.radius;
 
-                    if (dist < minDist && dist > 0) {
-                        const force = (minDist - dist) * 0.1;
-                        const nx = dx / dist;
-                        const ny = dy / dist;
+                    const overlapX = half1 + half2 - Math.abs(dx);
+                    const overlapY = half1 + half2 - Math.abs(dy);
 
-                        const new1X = e1.x - nx * force;
-                        const new1Y = e1.y - ny * force;
-                        const new2X = e2.x + nx * force;
-                        const new2Y = e2.y + ny * force;
+                    // If both overlaps are positive → squares overlap
+                    if (overlapX > 0 && overlapY > 0) {
 
-                        const e1HitsWall = e1.isCollidingWithWall(new1X, new1Y, walls);
-                        const e2HitsWall = e2.isCollidingWithWall(new2X, new2Y, walls);
+                        // Push along the *smallest* axis
+                        if (overlapX < overlapY) {
+                            const totalWeight = e1.weight + e2.weight;
+                            const push1 = overlapX * (e2.weight / totalWeight);
+                            const push2 = overlapX * (e1.weight / totalWeight);
+                            const dir = Math.sign(dx);
 
-                        if (!e1HitsWall) {
-                            e1.x = new1X;
-                            e1.y = new1Y;
-                        }
-                        if (!e2HitsWall) {
-                            e2.x = new2X;
-                            e2.y = new2Y;
+                            const new1X = e1.x - dir * push1;
+                            const new2X = e2.x + dir * push2;
+
+                            const e1Hits = e1.isCollidingWithWall(new1X, e1.y, walls);
+                            const e2Hits = e2.isCollidingWithWall(new2X, e2.y, walls);
+
+                            if (!e1Hits) e1.x = new1X;
+                            if (!e2Hits) e2.x = new2X;
+
+                        } else {
+                            const totalWeight = e1.weight + e2.weight;
+                            const push1 = overlapY * (e2.weight / totalWeight);
+                            const push2 = overlapY * (e2.weight / totalWeight);
+                            const dir = Math.sign(dy);
+
+                            const new1Y = e1.y - dir * push1;
+                            const new2Y = e2.y + dir * push2;
+
+                            const e1Hits = e1.isCollidingWithWall(e1.x, new1Y, walls);
+                            const e2Hits = e2.isCollidingWithWall(e2.x, new2Y, walls);
+
+                            if (!e1Hits) e1.y = new1Y;
+                            if (!e2Hits) e2.y = new2Y;
                         }
                     }
                 }
@@ -191,8 +208,9 @@ function update(deltaTime) {
                     const dist = Math.hypot(dx, dy) || 1;
                     const nx = dx / dist;
                     const ny = dy / dist;
-                    const enemyStrength = 0.5 * (enemy.damage || 1) * (enemy.weight || 1);
-                    const playerStrength = 0.03 * (player.damage || 1) * (player.weight || 1);
+                    const enemyStrength = Math.max(enemy.damage * 0.25, 1.4) * Math.max(enemy.weight * 0.4, 1.4);
+                    const playerStrength = (player.bodyDamage || 1) * (player.weight || 1) / enemy.weight;
+                    console.log(enemyStrength + ", " + playerStrength);
                     player.addKnockback(nx, ny, enemyStrength);
                     enemy.addKnockback(-nx, -ny, playerStrength);
                 }
