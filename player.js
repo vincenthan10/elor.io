@@ -13,7 +13,7 @@ export default class Player extends Entity {
         this.level = 1;
         this.xp = 0;
         this.xpNeeded = 10;
-        this.bodyDamage = 1;
+        this.bodyDamage = 0.5;
         this.strength = 2;
         this.regenUnlocked = false;
         this.regenRate = 0;
