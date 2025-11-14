@@ -7,7 +7,7 @@ export default class Entity {
 
         this.knockback = { x: 0, y: 0 };
         this.knockbackDecay = 0.85;
-        this.maxKnockback = 2.0;
+        this.maxKnockback = 4.0;
     }
 
     update(deltaTime, walls) {
@@ -69,6 +69,30 @@ export default class Entity {
                 return true;
             }
         }
+        return false;
+    }
+    isCollidingWithWallSq(x, y, walls) {
+        const half = this.radius / 2;
+        const left = x - half;
+        const right = x + half;
+        const top = y - half;
+        const bottom = y + half;
+
+        for (const wall of walls) {
+            const wLeft = wall.x;
+            const wRight = wall.x + wall.width;
+            const wTop = wall.y;
+            const wBottom = wall.y + wall.height;
+
+            const overlap =
+                right > wLeft &&
+                left < wRight &&
+                bottom > wTop &&
+                top < wBottom;
+
+            if (overlap) return true;
+        }
+
         return false;
     }
 }
