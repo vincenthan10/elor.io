@@ -1,19 +1,26 @@
 <!DOCTYPE html>
 <html lang="en">
-<!--TO DO: 
-- sword causes knockback for enemy but not player. sword does not knockback firepatch
--add new drop to zombieflame: fireshard and mysteriousflame -> can unlock new spells from a certain amount
--->
+<!--TODO:
+NOTE: ARROW KEYS CAN CAUSE PROBLEMS DUE TO HARDWARE ISSUES. FOR OPTIMAL PERFORMANCE, USE WASD FOR MOVEMENT.
+- bullet collide with fireball
+- bullet collide with dragon
+- dragon health and 3 stages
+- lightning collide with dragon
+- pause button and screen
+- learn to fix in the future: make dragon hitbox its body and not an image rectangle
+DO NOT ERASE THIS: REMEMBER TO MAKE YOUR OWN DRAGON, ALIEN, CLOUDS, LIGHTNING DRAWINGS IF YOU EVER GET TO THE FINAL PRODUCT-->
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>elor.io</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Dragon Shooter</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 
 <body>
-    <canvas id="gameCanvas" width="1080" height="600"></canvas>
+    <div id="canvasContainer">
+        <canvas id="gameCanvas" width="1080" height="600"></canvas>
+    </div>
     <script type="module" src="main.js"></script>
 </body>
 
